@@ -1,0 +1,39 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-image: url('https://cdn.discordapp.com/attachments/793120879156527144/1283412209963106326/pattern-7451714_1280.jpg?ex=66e2e643&is=66e194c3&hm=ee5b917f67a5eaebd1658dcab77ee67f0f63702eb70ee294ede110e5fc0df4c0&');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+header {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.logo {
+    width: 800px;
+    height: auto;
+}
+
+.container {
+    text-align: center;
+}
+
+.button-image {
+    display: block;
+    margin: 5px auto;
+    width: 400px; /* ขนาดใหม่ที่ปรับแล้ว */
+    height: auto;
+    transition: transform 0.3s;
+}
+
+.button-image:hover {
+    transform: scale(1.1);
+}
