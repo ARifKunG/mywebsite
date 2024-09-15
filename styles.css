@@ -3,8 +3,7 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4;
-    background-image: url('https://cdn.discordapp.com/attachments/793120879156527144/1283412209963106326/pattern-7451714_1280.jpg?ex=66e38f03&is=66e23d83&hm=9a361687c2bc43433d2b251a5464d1c5dcafcdf7f192450cfb76336433601065&');
+    background-image: url('https://cdn.discordapp.com/attachments/793120879156527144/1283762863382597652/futuristic-metaverse-empty-room-product-display-presentation-abstract-technology-scifi-with-neon-light-3d-background.jpg?ex=66e77895&is=66e62715&hm=0a44634aca445ae603c9bf40c58a6b617bfcfe8794deb2fa540124cf2702ceeb&');
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center center;
@@ -14,22 +13,19 @@ body {
 header {
     text-align: center;
     padding: 20px;
-    background: rgba(51, 51, 51, 0.8); /* เพิ่มความโปร่งแสงให้พื้นหลัง */
+    background: rgba(51, 51, 51, 0.8);
 }
 
 /* โลโก้ */
 .logo {
-    max-width: 100%;
+    max-width: 90%; /* ขนาดสูงสุดของโลโก้ */
     height: auto;
 }
 
 /* Container */
 main.container {
-    background-image: url('https://cdn.discordapp.com/attachments/793120879156527144/1283762863382597652/futuristic-metaverse-empty-room-product-display-presentation-abstract-technology-scifi-with-neon-light-3d-background.jpg?ex=66e42cd5&is=66e2db55&hm=75c6811db5cbc11c2cc37d77bbb4fa69d8e71770e47007ec1889ab230ba62c5a&');
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center center;
-    padding: 40px; /* เพิ่มพื้นที่ด้านในเพื่อให้ปุ่มมีพื้นที่มากขึ้น */
+    padding: 20px; /* ลดพื้นที่เพื่อไม่ให้ขอบกระทบ */
+    background: rgba(74, 67, 175, 0.8);
     border-radius: 16px;
     display: flex;
     flex-wrap: wrap;
@@ -39,45 +35,51 @@ main.container {
 /* ปุ่ม */
 .button-link {
     display: inline-block;
-    margin: 15px; /* เพิ่มระยะห่างระหว่างปุ่ม */
+    margin: 10px; /* ลดระยะห่างเพื่อประหยัดพื้นที่ */
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .button-image {
-    width: 200px; /* ขนาดเริ่มต้นของปุ่ม */
+    max-width: 100%; /* ปรับให้รูปภาพไม่เกินขนาดของหน้าจอ */
     height: auto;
-    border-radius: 12px; /* ขอบมน */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* เพิ่มเงาให้กับปุ่ม */
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(160, 7, 7, 0.2);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .button-link:hover .button-image {
-    transform: scale(1.1); /* ขยายขนาดปุ่มขณะ hover */
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* เพิ่มเงาขณะ hover */
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgba(28, 7, 104, 0.3);
 }
 
 /* Media Queries */
-@media (max-width: 768px) {
+@media (max-width: 480px) {
     .button-image {
-        width: 300px; /* ขนาดที่เล็กลงสำหรับมือถือ */
+        width: 100%; /* ใช้ขนาดเต็มความกว้างของหน้าจอมือถือ */
+    }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+    .button-image {
+        width: 80%; /* ใช้ขนาดที่เล็กลงบนแท็บเล็ต */
     }
 }
 
 @media (min-width: 769px) and (max-width: 1024px) {
     .button-image {
-        width: 240px; /* ขนาดที่เล็กกว่าคอมพิวเตอร์ แต่ใหญ่กว่ามือถือ */
+        width: 60%; /* ขนาดปุ่มสำหรับโน้ตบุ๊คและแท็บเล็ตขนาดใหญ่ */
     }
 }
 
 @media (min-width: 1025px) {
     .button-image {
-        width: 500px; /* ขนาดปกติสำหรับคอมพิวเตอร์ */
+        width: 400px; /* ขนาดปุ่มสำหรับคอมพิวเตอร์ */
     }
 }
 
 /* Footer */
 footer {
-    background: rgba(51, 51, 51, 0.9); /* เพิ่มความโปร่งแสงให้พื้นหลัง */
+    background: rgba(223, 8, 8, 0.9);
     color: #fff;
     text-align: center;
     padding: 20px;
