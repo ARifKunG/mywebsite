@@ -3,7 +3,7 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-image: url('https://cdn.discordapp.com/attachments/793120879156527144/1283762863382597652/futuristic-metaverse-empty-room-product-display-presentation-abstract-technology-scifi-with-neon-light-3d-background.jpg?ex=66e77895&is=66e62715&hm=0a44634aca445ae603c9bf40c58a6b617bfcfe8794deb2fa540124cf2702ceeb&');
+    background-image: url('https://media.discordapp.net/attachments/793120879156527144/1283762863382597652/futuristic-metaverse-empty-room-product-display-presentation-abstract-technology-scifi-with-neon-light-3d-background.jpg?ex=66f00a55&is=66eeb8d5&hm=ed481490069d21f4283707532255994fec1b729fbb1d40124d4dc5b24bff3d43&=&format=webp&width=525&height=350');
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center center;
@@ -24,18 +24,18 @@ header {
 
 /* Container */
 main.container {
-    padding: 20px; /* ลดพื้นที่เพื่อไม่ให้ขอบกระทบ */
+    padding: 10px; /* ลดพื้นที่เพื่อไม่ให้ขอบกระทบ */
     background: rgba(74, 67, 175, 0.8);
     border-radius: 16px;
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    flex-direction: column; /* จัดเรียงในแนวตั้ง */
+    align-items: center; /* จัดกลางเนื้อหา */
 }
 
 /* ปุ่ม */
 .button-link {
     display: inline-block;
-    margin: 10px; /* ลดระยะห่างเพื่อประหยัดพื้นที่ */
+    margin: 5px 0; /* ลดระยะห่างเพื่อประหยัดพื้นที่ */
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -53,9 +53,17 @@ main.container {
 }
 
 /* Media Queries */
-@media (max-width: 480px) {
+@media (max-width: 600px) {
+    body {
+        padding: 10px; /* ลด padding เพื่อให้พอดีกับหน้าจอ */
+    }
+
     .button-image {
         width: 100%; /* ใช้ขนาดเต็มความกว้างของหน้าจอมือถือ */
+    }
+
+    header, footer {
+        padding: 10px; /* ลด padding ใน header และ footer */
     }
 }
 
