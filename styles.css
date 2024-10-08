@@ -3,7 +3,7 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-image: url('https://media.discordapp.net/attachments/793120879156527144/1283762863382597652/futuristic-metaverse-empty-room-product-display-presentation-abstract-technology-scifi-with-neon-light-3d-background.jpg?ex=66f00a55&is=66eeb8d5&hm=ed481490069d21f4283707532255994fec1b729fbb1d40124d4dc5b24bff3d43&=&format=webp&width=525&height=350');
+    background-image: url('https://raw.githubusercontent.com/ARifKunG/mywebsite/refs/heads/main/futuristic-metaverse-empty-room-product-display-presentation-abstract-technology-scifi-with-neon-light-3d-background.jpg');
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center center;
@@ -88,7 +88,7 @@ main.container {
 /* Footer */
 footer {
     background: rgba(223, 8, 8, 0.9);
-    color: #fff;
+    color: #da1010;
     text-align: center;
     padding: 20px;
     position: relative;
