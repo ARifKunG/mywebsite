@@ -1,4 +1,3 @@
-// ============= Loading/Particles/Notification ===================
 window.onload = function () {
     setTimeout(() => {
         document.getElementById('loadingScreen').style.opacity = 0;
@@ -7,8 +6,8 @@ window.onload = function () {
     showAchievement();
     createParticles();
     renderDonorList();
-    renderPlaylist();
 };
+
 function showAchievement(text='🏆 Achievement Unlocked: Visitor!') {
     const ach = document.getElementById('achievement');
     ach.textContent = text;
@@ -26,9 +25,21 @@ function createParticles() {
         particles.appendChild(p);
     }
 }
-// ============= วงล้อสุ่มคนโดเนท ===============
+
+// วงล้อสุ่มคนโดเนท (toggle ได้)
 let donors = JSON.parse(localStorage.getItem('donors') || '[]');
 let spinning = false;
+
+function toggleWheelGame() {
+    const container = document.getElementById('wheelGameContainer');
+    if (container.style.display === 'none' || container.style.display === '') {
+        container.style.display = "flex";
+        renderDonorList();
+    } else {
+        container.style.display = "none";
+    }
+}
+
 function addDonor() {
     const name = document.getElementById('donorName').value.trim();
     if (!name || donors.includes(name)) return;
@@ -51,11 +62,13 @@ function renderDonorList() {
     else html = donors.map((n, i) =>
         `<span style="margin-right:8px;">${i+1}) ${n}</span>`
     ).join('<br>');
-    document.getElementById('donorList').innerHTML = html;
+    const donorList = document.getElementById('donorList');
+    if (donorList) donorList.innerHTML = html;
     drawWheel();
 }
 function drawWheel() {
     const wheel = document.getElementById('wheel');
+    if (!wheel) return;
     wheel.innerHTML = '<div class="wheel-center">🎯</div>';
     if (!donors.length) return;
     const canvas = document.createElement('canvas');
@@ -104,190 +117,3 @@ function spinWheel() {
         document.getElementById('spinBtn').disabled = false;
     }, 3000);
 }
-// ============= Music Player With Youtube and Playlist =============
-let playlist = JSON.parse(localStorage.getItem('playlist') || '[]');
-let current = parseInt(localStorage.getItem('currentSong')||'0',10) || 0;
-let playing = false;
-let player, playTimer;
-let playlists = JSON.parse(localStorage.getItem('userPlaylists') || '[]');
-let userInteracted = false;
-function renderPlaylist() {
-    let html = '';
-    if (!playlist.length) html = `<div style="text-align:center;opacity:0.5;">ยังไม่มีเพลงในเพลย์ลิสต์</div>`;
-    else html = playlist.map((song,i) =>
-        `<div class="playlist-item${i===current?' active':''}" onclick="playSong(${i})">
-            <span class="playlist-item-title">${song.title||song.id}</span>
-            <button class="remove-btn" onclick="event.stopPropagation();removeSong(${i})">✖</button>
-        </div>`
-    ).join('');
-    document.getElementById('playlist').innerHTML = html;
-    updateCurrentSong();
-}
-function addMusic() {
-    const url = document.getElementById('musicUrl').value.trim();
-    if (!url) return;
-    let ytId = '';
-    let ytMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/))([\w-]{11})/);
-    if (ytMatch) ytId = ytMatch[1];
-    else if (url.length === 11 && /^[\w-]{11}$/.test(url)) ytId = url;
-    else {
-        searchYouTube(url, function(result){
-            if(result) pushSong({id:result.id,title:result.title});
-        });
-        document.getElementById('musicUrl').value = '';
-        return;
-    }
-    pushSong({id:ytId,title:''});
-    document.getElementById('musicUrl').value = '';
-}
-function pushSong(song) {
-    if (playlist.find(s => s.id === song.id)) return;
-    playlist.push(song);
-    localStorage.setItem('playlist', JSON.stringify(playlist));
-    renderPlaylist();
-}
-function removeSong(idx) {
-    playlist.splice(idx,1);
-    if (current>=playlist.length) current=0;
-    localStorage.setItem('playlist', JSON.stringify(playlist));
-    renderPlaylist();
-}
-function playSong(idx) {
-    current = idx;
-    localStorage.setItem('currentSong', current);
-    updateCurrentSong();
-    playFromPlaylist();
-}
-function nextSong() {
-    if (!playlist.length) return;
-    current = (current+1)%playlist.length;
-    playSong(current);
-}
-function prevSong() {
-    if (!playlist.length) return;
-    current = (current-1+playlist.length)%playlist.length;
-    playSong(current);
-}
-function updateCurrentSong() {
-    const song = playlist[current]||{};
-    document.getElementById('songTitle').innerText = song.title||song.id||'-';
-    document.getElementById('songDuration').innerText = '';
-    const items = document.querySelectorAll('.playlist-item');
-    items.forEach((el,i)=>el.classList.toggle('active',i===current));
-}
-// รองรับทุกอุปกรณ์ ต้องให้ user กดปุ่มจริงก่อนเล่น
-function togglePlay() {
-    userInteracted = true;
-    if (!player) playFromPlaylist();
-    else if (playing) { 
-        player.pauseVideo(); 
-        playing=false; 
-        document.getElementById('playPauseBtn').innerText='▶️';
-    } else { 
-        player.playVideo(); 
-        player.unMute();
-        player.setVolume(Number(document.getElementById('volumeSlider').value));
-        playing=true; 
-        document.getElementById('playPauseBtn').innerText='⏸️';
-    }
-}
-// สำหรับ mobile/touch event
-document.getElementById('playPauseBtn').addEventListener('touchstart', function(e){
-    e.preventDefault(); togglePlay();
-});
-function playFromPlaylist() {
-    if (!playlist.length) return;
-    const song = playlist[current];
-    loadYouTube(song.id, song.title, function(title,duration){
-        playlist[current].title = title;
-        localStorage.setItem('playlist', JSON.stringify(playlist));
-        document.getElementById('songTitle').innerText = title;
-        document.getElementById('songDuration').innerText = duration?('⏱ ' + duration):'';
-    });
-    playing = true;
-    document.getElementById('playPauseBtn').innerText = '⏸️';
-}
-function setVolume(v) {
-    if (player) {
-        player.setVolume(Number(v));
-        player.unMute();
-    }
-}
-function toggleMusicPlayer() {
-    document.getElementById('musicPlayer').classList.toggle('collapsed');
-}
-// ========== Youtube API (ฝังแบบ dynamic) ==========
-let ytApiLoaded = false;
-function loadYouTube(id, title, cb) {
-    if (!ytApiLoaded) {
-        let tag = document.createElement('script');
-        tag.src = "https://www.youtube.com/iframe_api";
-        document.body.appendChild(tag);
-        ytApiLoaded = true;
-        window.onYouTubeIframeAPIReady = function() {
-            playYt(id, title, cb);
-        }
-    } else playYt(id, title, cb);
-}
-function playYt(id, title, cb) {
-    if (player) {
-        player.loadVideoById(id);
-        player.unMute();
-        player.setVolume(Number(document.getElementById('volumeSlider').value));
-        if (userInteracted) player.playVideo();
-    }
-    else {
-        player = new YT.Player('youtubePlayer', {
-            height: '0', width: '0', videoId: id, playerVars: { 'autoplay': 0 },
-            events: {
-                'onReady': function(e) {
-                    player.setVolume(Number(document.getElementById('volumeSlider').value));
-                    player.unMute();
-                    if (userInteracted) player.playVideo();
-                },
-                'onStateChange': onPlayerStateChange
-            }
-        });
-    }
-    getYtInfo(id, function(meta) {
-        if (cb) cb(meta.title||title, meta.duration||'');
-    });
-}
-function onPlayerStateChange(e) {
-    if (e.data === YT.PlayerState.ENDED) nextSong();
-    // handle mute cases on mobile
-    if (e.data === YT.PlayerState.PLAYING) {
-        player.unMute();
-        player.setVolume(Number(document.getElementById('volumeSlider').value));
-    }
-}
-function getYtInfo(id, cb) {
-    fetch('https://noembed.com/embed?url=https://youtube.com/watch?v='+id)
-        .then(r=>r.json()).then(data=>{
-            let dur = '';
-            if (data.duration) {
-                var sec = parseInt(data.duration,10);
-                dur = Math.floor(sec/60)+':'+('0'+sec%60).slice(-2);
-            }
-            cb({title:data.title||id,duration:dur});
-        }).catch(()=>cb({title:id}));
-}
-function searchYouTube(query, cb) {
-    fetch('https://yt.lemnoslife.com/search?part=snippet&q='+encodeURIComponent(query))
-    .then(r=>r.json())
-    .then(j=>{
-        if (j.items && j.items.length > 0) {
-            cb({id:j.items[0].id.videoId,title:j.items[0].snippet.title});
-        } else cb(null);
-    })
-    .catch(()=>cb(null));
-}
-function createPlaylist() {
-    const n = prompt('ชื่อเพลย์ลิสต์ใหม่?');
-    if (!n) return;
-    playlists.push({name:n, songs:playlist});
-    localStorage.setItem('userPlaylists', JSON.stringify(playlists));
-    alert('บันทึกเพลย์ลิสต์ "'+n+'" แล้ว!');
-}
-renderDonorList();
-renderPlaylist();

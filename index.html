@@ -25,7 +25,10 @@
             <div class="typing-text"> ฮั่นแน่ มาหาเซิฟ VIP ฟรีอะดิ่ !</div>
         </div>
     </header>
-    <div class="mini-games">
+    <div class="center-btn">
+        <button id="toggleWheelBtn" class="main-toggle-btn" onclick="toggleWheelGame()">🎲 เปิด/ปิด วงล้อสุ่มคนโดเนท</button>
+    </div>
+    <div class="mini-games" id="wheelGameContainer" style="display:none;">
         <div class="mini-game">
             <div class="wheel-container">
                 <h3>🎲 วงล้อคนโดเนท</h3>
@@ -94,34 +97,6 @@
             </div>
         </a>
     </main>
-    <div class="music-player" id="musicPlayer">
-        <div class="music-header">
-            <span class="music-title">🎵 ARifKunG Music Hub</span>
-            <button class="collapse-btn" onclick="toggleMusicPlayer()">⏬</button>
-        </div>
-        <div class="music-content">
-            <div class="current-song" id="currentSong">
-                <div class="song-title" id="songTitle">ยังไม่มีเพลงกำลังเล่น</div>
-                <div class="song-duration" id="songDuration"></div>
-            </div>
-            <div class="music-controls">
-                <button class="music-btn" onclick="prevSong()" title="ก่อนหน้า">⏮️</button>
-                <button class="music-btn" onclick="togglePlay()" id="playPauseBtn" title="เล่น/หยุด">▶️</button>
-                <button class="music-btn" onclick="nextSong()" title="ถัดไป">⏭️</button>
-            </div>
-            <div class="volume-control">
-                <span>🔊</span>
-                <input type="range" min="0" max="100" value="80" class="volume-slider" id="volumeSlider" onchange="setVolume(this.value)">
-            </div>
-            <div class="add-music-section">
-                <input class="url-input" id="musicUrl" placeholder="วางลิงก์ Youtube หรือค้นหาชื่อเพลง..." onkeydown="if(event.key === 'Enter') addMusic()">
-                <button class="add-btn" onclick="addMusic()">เพิ่มเพลง</button>
-                <button class="add-btn" style="background:linear-gradient(45deg,#00ff41,#00cc33);margin-top:5px;" onclick="createPlaylist()">สร้างเพลย์ลิสต์ใหม่</button>
-            </div>
-            <div class="playlist" id="playlist"></div>
-        </div>
-        <div id="youtubePlayer" style="display:none;"></div>
-    </div>
     <script src="main.js"></script>
 </body>
 </html>
