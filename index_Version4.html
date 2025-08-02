@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 ARifKunG Hub 🎮</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-text">🎮 LOADING CONTENT... 🎮</div>
+    </div>
+    <div class="matrix-bg"></div>
+    <div class="particles" id="particles"></div>
+    <div class="achievement" id="achievement">🏆 Achievement Unlocked: Visitor!</div>
+    <header>
+        <div class="gamer-profile">
+            <div class="avatar-container">
+                <img src="https://github.com/ARifKunG/mywebsite/blob/main/LOGO%20WEB.png?raw=true" alt="Gamer Avatar" class="avatar">
+                <div class="status-indicator" title="Online"></div>
+            </div>
+            <h1 class="gamer-name"> ARifKunG </h1>
+            <p class="gamer-title">🎮 Streamer ที่บิดคนดูเก่งขนาดนี้ 🎮</p>
+            <div class="typing-text"> ฮั่นแน่ มาหาเซิฟ VIP ฟรีอะดิ่ !</div>
+        </div>
+    </header>
+    <div class="mini-games">
+        <div class="mini-game">
+            <div class="wheel-container">
+                <h3>🎲 วงล้อคนโดเนท</h3>
+                <div class="donor-input">
+                    <input type="text" id="donorName" placeholder="ชื่อคนโดเนท" maxlength="20">
+                    <button onclick="addDonor()">เพิ่ม</button>
+                    <button onclick="clearDonors()">ล้าง</button>
+                </div>
+                <div class="donor-list" id="donorList"><div style="text-align:center;opacity:0.5;">ยังไม่มีคนโดเนท</div></div>
+                <div style="position: relative;">
+                    <div class="wheel-pointer"></div>
+                    <div class="wheel" id="wheel"><div class="wheel-center">🎯</div></div>
+                </div>
+                <button class="spin-btn" id="spinBtn" onclick="spinWheel()">หมุน!</button>
+                <p>ผู้ชนะ: <span id="winner">-</span></p>
+            </div>
+        </div>
+    </div>
+    <main class="social-grid">
+        <a href="https://discord.gg/gDNxGqr2EC" target="_blank" class="social-card">
+            <div class="card-header">
+                <img src="https://raw.githubusercontent.com/ARifKunG/mywebsite/refs/heads/main/dclogo.jpg" alt="Discord" class="card-icon">
+                <div class="card-content">
+                    <h3>🎮 Discord Server</h3>
+                    <p>Join our gaming community! Chat, play together, and share epic moments.</p>
+                </div>
+            </div>
+            <div class="stats-bar">
+                <small>👥 Active Members: 1,337+ | 🎯 Gaming Focused</small>
+            </div>
+        </a>
+        <a href="https://www.instagram.com/arif_kaweekhet_/" target="_blank" class="social-card">
+            <div class="card-header">
+                <img src="https://raw.githubusercontent.com/ARifKunG/mywebsite/refs/heads/main/LOGO1.jpg" alt="Instagram" class="card-icon">
+                <div class="card-content">
+                    <h3>📸 Instagram</h3>
+                    <p>Behind the scenes content, gaming setups, and daily life updates.</p>
+                </div>
+            </div>
+            <div class="stats-bar">
+                <small>📱 Stories Daily | 🎬 Gaming Content | 🔥 Epic Highlights</small>
+            </div>
+        </a>
+        <a href="https://www.roblox.com/share?code=4f2ba7a02467d54fbad2b5d7c5aa6352&type=Server" target="_blank" class="social-card">
+            <div class="card-header">
+                <img src="https://github.com/ARifKunG/mywebsite/blob/main/LOGO%20BF%20WEB.png?raw=true" alt="Roblox" class="card-icon">
+                <div class="card-content">
+                    <h3>🎯 VIP Server</h3>
+                    <p> เซิฟ VIP กดตรงนี้เลย! ใช้ได้ตลอด อย่าโปรจนเซิฟมีปัญหาก็พอ!! </p>
+                </div>
+            </div>
+            <div class="stats-bar">
+                <small>⭐ VIP | 🎮 Private</small>
+            </div>
+        </a>
+        <a href="https://tipme.in.th/9dea6ccb9b9f03fc2886f8dd" target="_blank" class="social-card">
+            <div class="card-header">
+                <img src="https://github.com/ARifKunG/mywebsite/blob/main/LOGO%20DONATE%20WEB.png?raw=true" alt="Support" class="card-icon">
+                <div class="card-content">
+                    <h3>💎 Support Stream</h3>
+                    <p>ช่วยสนับสนุน เลี้ยงน้ำ เลี้ยงข้าว เลี้ยงกาแฟ สตรีมเมอร์ !</p>
+                </div>
+            </div>
+            <div class="stats-bar">
+                <small>🎯 Goal: อัพคอม! | 💝 สร้างกำลังใจ | 🙏 ขอบคุณครับ</small>
+            </div>
+        </a>
+    </main>
+    <div class="music-player" id="musicPlayer">
+        <div class="music-header">
+            <span class="music-title">🎵 ARifKunG Music Hub</span>
+            <button class="collapse-btn" onclick="toggleMusicPlayer()">⏬</button>
+        </div>
+        <div class="music-content">
+            <div class="current-song" id="currentSong">
+                <div class="song-title" id="songTitle">ยังไม่มีเพลงกำลังเล่น</div>
+                <div class="song-duration" id="songDuration"></div>
+            </div>
+            <div class="music-controls">
+                <button class="music-btn" onclick="prevSong()" title="ก่อนหน้า">⏮️</button>
+                <button class="music-btn" onclick="togglePlay()" id="playPauseBtn" title="เล่น/หยุด">▶️</button>
+                <button class="music-btn" onclick="nextSong()" title="ถัดไป">⏭️</button>
+            </div>
+            <div class="volume-control">
+                <span>🔊</span>
+                <input type="range" min="0" max="100" value="80" class="volume-slider" id="volumeSlider" onchange="setVolume(this.value)">
+            </div>
+            <div class="add-music-section">
+                <input class="url-input" id="musicUrl" placeholder="วางลิงก์ Youtube หรือค้นหาชื่อเพลง..." onkeydown="if(event.key === 'Enter') addMusic()">
+                <button class="add-btn" onclick="addMusic()">เพิ่มเพลง</button>
+                <button class="add-btn" style="background:linear-gradient(45deg,#00ff41,#00cc33);margin-top:5px;" onclick="createPlaylist()">สร้างเพลย์ลิสต์ใหม่</button>
+            </div>
+            <div class="playlist" id="playlist"></div>
+        </div>
+        <div id="youtubePlayer" style="display:none;"></div>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>
