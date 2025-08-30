@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 ARifKunG Hub 🎮</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-text">🎮 LOADING ARIFKUNG HUB... 🎮</div>
+    </div>
+    <div class="matrix-bg"></div>
+    <div class="particles" id="particles"></div>
+    <div class="achievement" id="achievement">🏆 Achievement Unlocked: Welcome Gamer!</div>
+    <header>
+        <div class="gamer-profile">
+            <div class="avatar-container">
+                <img src="https://github.com/ARifKunG/mywebsite/blob/main/LOGO%20WEB.png?raw=true" alt="Gamer Avatar" class="avatar">
+                <div class="status-indicator" title="Online Now"></div>
+            </div>
+            <h1 class="gamer-name">ARifKunG</h1>
+            <p class="gamer-title">🎮 Streamer ที่บิดคนดูเก่งขนาดนี้ 🎮</p>
+            <div class="typing-text">ฮั่นแน่ มาหาเซิฟ VIP ฟรีอะดิ่ !</div>
+        </div>
+    </header>
+    <div class="center-btn">
+        <button id="toggleGameBtn" class="main-toggle-btn" onclick="toggleDinoGame()">🦖 เปิด/ปิด เกมไดโนเสาร์</button>
+    </div>
+    <div class="mini-games" id="gameContainer" style="display:none;">
+        <div class="mini-game">
+            <div class="game-container">
+                <h3 class="game-title">🦖 Cyber Dino Runner</h3>
+                <div class="game-info">
+                    <div class="score">Score: <span id="score">0</span></div>
+                    <div class="high-score">High: <span id="highScore">0</span></div>
+                </div>
+                <canvas id="gameCanvas" class="game-canvas" width="600" height="300"></canvas>
+                <div class="game-over" id="gameOver">
+                    <h2>Game Over!</h2>
+                    <p>Your Score: <span id="finalScore">0</span></p>
+                    <button class="control-btn" onclick="restartGame()">Play Again</button>
+                </div>
+                <div class="game-controls">
+                    <button class="control-btn" id="startBtn" onclick="startGame()">Start Game</button>
+                    <button class="control-btn" onclick="jumpDino()">Jump (Space)</button>
+                    <button class="control-btn" onclick="restartGame()">Restart</button>
+                </div>
+                <div class="game-instructions">
+                    <strong>🎮 How to Play:</strong><br>
+                    • กด <strong>Space</strong> หรือปุ่ม Jump เพื่อกระโดด<br>
+                    • หลีกเลี่ยงกระบองเพชร! 🌵<br>
+                    • คะแนนจะเพิ่มขึ้นเรื่อยๆ ยิ่งอยู่รอดได้นานยิ่งดี!<br>
+                    • เกมจะเร็วขึ้นเรื่อยๆ - ท้าทายสกิลคุณ! 🔥
+                </div>
+            </div>
+        </div>
+    </div>
+    <main class="social-grid">
+        <a href="https://discord.gg/gDNxGqr2EC" target="_blank" class="social-card">
+            <div class="card-header">
+                <img src="https://raw.githubusercontent.com/ARifKunG/mywebsite/refs/heads/main/LOGO%20DIS.png" alt="Discord" class="card-icon">
+                <div class="card-content">
+                    <h3>🎮 Discord Server</h3>
+                    <p>เข้าร่วมกลุ่ม Discord กดเลย ไว้พูดคุย ส่งมีม สอบถามต่างๆ ทางนี้!!!</p>
+                </div>
+            </div>
+            <div class="stats-bar">
+                <small>👥 สังคม , หาเพื่อนเล่นเกม , ข้อมูลข่าวสาร , บอทฟังเพลง | 🎯 Gaming Focused</small>
+            </div>
+        </a>
+        <a href="https://www.instagram.com/arif_kaweekhet_/" target="_blank" class="social-card">
+            <div class="card-header">
+                <img src="https://raw.githubusercontent.com/ARifKunG/mywebsite/refs/heads/main/LOGO%20IG.png" alt="Instagram" class="card-icon">
+                <div class="card-content">
+                    <h3>📸 Instagram</h3>
+                    <p>ติดตามชีวิตส่วนตัวหลังไมค์ ดูมุมขี้เก๊กของสตรีมเมอร์ 5555</p>
+                </div>
+            </div>
+            <div class="stats-bar">
+                <small>📱 ชีวิตประจำวัน | 🎬 สตอรี่ เรื่อยเปื่อย | 🔥 ถ่ายวิวมากกว่าหน้าตัวเอง</small>
+            </div>
+        </a>
+        <a href="https://www.roblox.com/share?code=4f2ba7a02467d54fbad2b5d7c5aa6352&type=Server" target="_blank" class="social-card">
+            <div class="card-header">
+                <img src="https://github.com/ARifKunG/mywebsite/blob/main/LOGO%20BF%20WEB.png?raw=true" alt="Roblox" class="card-icon">
+                <div class="card-content">
+                    <h3>🎯 VIP Server</h3>
+                    <p>เซิฟ VIP กดตรงนี้เลย! ใช้ได้ตลอด อย่าโปรจนเซิฟมีปัญหาก็พอ!!</p>
+                </div>
+            </div>
+            <div class="stats-bar">
+                <small>⭐ VIP | 🎮 Private Server | 🚀 Always Online</small>
+            </div>
+        </a>
+        <a href="https://tipme.in.th/9dea6ccb9b9f03fc2886f8dd" target="_blank" class="social-card">
+            <div class="card-header">
+                <img src="https://github.com/ARifKunG/mywebsite/blob/main/LOGO%20DONATE%20WEB.png?raw=true" alt="Support" class="card-icon">
+                <div class="card-content">
+                    <h3>💎 Support Stream</h3>
+                    <p>ช่วยสนับสนุน เลี้ยงน้ำ เลี้ยงข้าว เลี้ยงกาแฟ สตรีมเมอร์!</p>
+                </div>
+            </div>
+            <div class="stats-bar">
+                <small>🎯 Goal: อัพคอม! | 💝 สร้างกำลังใจ | 🙏 ขอบคุณครับ</small>
+            </div>
+        </a>
+    </main>
+    <script src="game.js"></script>
+</body>
+</html>
