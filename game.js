@@ -168,49 +168,61 @@ function updateBirds() {
             birds[i].flapUp = !birds[i].flapUp;
             birds[i].flapTimer = 0;
         }
-        birds[i].y += birds[i].flapUp ? -1 : 1;
+        // นกบินระดับเดียวกับที่ไดโนกระโดดสูงสุด (ไม่มีแกว่ง)
+        birds[i].y = getBirdFlyingY();
         if (birds[i].x + birds[i].width < 0) {
             birds.splice(i, 1);
         }
     }
 }
 
+// กระบองเพชรเล็ก ระยะห่างเยอะ เล่นง่าย
 function spawnObstacles() {
     if (!gameRunning) return;
-    // ปรับขนาดเล็กลง กระโดดง่ายขึ้น!
+    // ขนาดเล็ก กระโดดง่าย
     const obstacle = {
         x: canvas.width,
-        y: canvas.height - 40 - 35, // 35 คือความสูงใหม่
-        width: 30,  // เล็กลง จาก 70
-        height: 35, // เล็กลงจาก 70
+        y: canvas.height - 40 - 30,
+        width: 26,
+        height: 30,
         color: '#ff006e'
     };
 
     obstacles.push(obstacle);
 
-    // Schedule next obstacle
-    const delay = Math.random() * 1200 + 700;
+    // Schedule next obstacle (ระยะห่างเยอะขึ้น)
+    const delay = Math.random() * 1500 + 1100; // 1.1-2.6 วินาที
     setTimeout(spawnObstacles, delay);
 }
 
+// นกจะบินระดับเดียวกับจุดสูงสุดที่ไดโนกระโดดได้
 function spawnBird() {
     if (!gameRunning) return;
-    // นกโผล่ช้าๆ นาน ๆ มาครั้ง (เช่น 7-12 วินาที)
     const bird = {
         x: canvas.width,
-        y: canvas.height - (Math.random() * 120 + 120),
+        y: getBirdFlyingY(),
         width: 48,
         height: 48,
         speed: Math.random() * 2 + 4,
-        flapUp: Math.random() > 0.5,
+        flapUp: false,
         flapTimer: 0
     };
-
     birds.push(bird);
 
-    // Schedule next bird (นาน ๆ มาครั้ง)
-    const delay = Math.random() * 5000 + 7000; // 7-12 วินาที
+    // นาน ๆ มาครั้ง
+    const delay = Math.random() * 7000 + 8000; // 8-15 วินาที
     setTimeout(spawnBird, delay);
+}
+
+// คำนวณ y ที่นกบิน (ระดับเดียวกับจุดสูงสุดที่ไดโนกระโดดได้)
+function getBirdFlyingY() {
+    // จุดพื้น ground = canvas.height - 40
+    // จุดสูงสุดที่ไดโนจะไปถึง = ground - jumpPower * jumpPower / (2*gravity)
+    // แต่เนื่องจาก dino เริ่มกระโดดจาก ground - dino.height
+    // (ใช้สูตร s = v^2/(2g))
+    const groundY = canvas.height - 40;
+    const jumpHeight = (jumpPower * jumpPower) / (2 * gravity);
+    return groundY - dino.height - jumpHeight - 10; // -10 buffer ให้ชนง่ายขึ้น
 }
 
 function checkCollisions() {
@@ -327,14 +339,12 @@ function drawGame() {
 function drawGrid() {
     ctx.strokeStyle = 'rgba(0, 255, 65, 0.1)';
     ctx.lineWidth = 1;
-
     for (let x = 0; x < canvas.width; x += 40) {
         ctx.beginPath();
         ctx.moveTo(x, 0);
         ctx.lineTo(x, canvas.height);
         ctx.stroke();
     }
-
     for (let y = 0; y < canvas.height; y += 40) {
         ctx.beginPath();
         ctx.moveTo(0, y);
