@@ -28,13 +28,13 @@ let gameStarted = false;
 let score = 0;
 let highScore = Number(localStorage.getItem('dinoHighScore') || '0');
 
-// ปรับความเร็วเริ่มต้นให้ช้าลง (เดิม 3)
-let gameSpeed = 1.5; // <<< ช้าลง
+// ปรับความเร็วเริ่มต้นให้ช้าลง
+let gameSpeed = 1.5;
 let gravity = 0.5;
 let jumpPower = 12;
 
 let dino = {
-    x: 70, // ขยับออกจากขอบซ้าย
+    x: 70,
     y: 0,
     width: 60,
     height: 60,
@@ -65,9 +65,9 @@ function resizeCanvas() {
     const container = canvas.parentElement;
     const maxWidth = Math.min(600, container.offsetWidth - 40);
     canvas.width = maxWidth;
-    canvas.height = Math.max(280, maxWidth * 0.55); // สูงขึ้นเล็กน้อย
-    dino.y = canvas.height - dino.height - 50; // ขยับลงต่ำกว่าเดิม
-    dino.x = Math.max(70, canvas.width * 0.12); // ขยับออกจากขอบ
+    canvas.height = Math.max(280, maxWidth * 0.55);
+    dino.y = canvas.height - dino.height - 50;
+    dino.x = Math.max(70, canvas.width * 0.12);
 }
 
 setTimeout(() => {
@@ -126,7 +126,7 @@ window.startGame = function() {
     gameRunning = true;
     gameStarted = true;
     score = 0;
-    gameSpeed = 1.5; // <<< ให้ช้าทุกครั้งที่เริ่มเกม
+    gameSpeed = 1.5;
     obstacles = [];
     boxes = [];
     coins = [];
@@ -143,10 +143,66 @@ window.startGame = function() {
     document.getElementById('memeMsg').classList.remove('show');
 
     gameLoop();
-    spawnObstacles();
-    spawnBox();
-    spawnCoin();
-    spawnPit();
+    scheduleNextSet(); // เปลี่ยนจาก spawnObstacles แบบเดิม
+}
+
+// เว้นระยะห่างมากๆในการ spawn อุปสรรคแต่ละชนิด (แต่ละรอบสุ่มว่าจะเจออะไร)
+function scheduleNextSet() {
+    if (!gameRunning) return;
+
+    // เว้นช่องว่างสุ่มแต่ละชุด (ระยะห่างเยอะ)
+    const minGap = canvas.width * 0.4; // ต้องวิ่งได้ 40% ของจอก่อนเจอสิ่งใหม่
+    const maxGap = canvas.width * 0.65; // สูงสุด 65%
+    let gap = Math.random() * (maxGap - minGap) + minGap;
+
+    // สุ่มว่าจะ spawn อะไร (แค่ 1 อย่างในแต่ละรอบ)
+    let choices = ['cactus', 'box', 'coin', 'pit'];
+    let type = choices[Math.floor(Math.random() * choices.length)];
+
+    // จะไม่ spawn ซ้อนกัน
+    if (type === 'cactus') {
+        obstacles.push({
+            x: canvas.width + gap,
+            y: canvas.height - 50 - 45,
+            width: 38,
+            height: 45,
+            color: '#ff006e'
+        });
+    } else if (type === 'box') {
+        boxes.push({
+            x: canvas.width + gap,
+            y: canvas.height - 50 - 38,
+            width: 32,
+            height: 32
+        });
+    } else if (type === 'coin') {
+        coins.push({
+            x: canvas.width + gap,
+            y: canvas.height - 50 - dino.height - 24,
+            width: 24,
+            height: 24
+        });
+    } else if (type === 'pit') {
+        pits.push({
+            x: canvas.width + gap,
+            y: canvas.height - 50,
+            width: 36,
+            height: 12
+        });
+    }
+
+    // เพิ่ม comboJump เฉพาะ cactus/box/pit
+    if (type !== 'coin') {
+        comboJump++;
+        if (comboJump === 10) {
+            showAchievement("🔥 Combo 10! เก่งมาก");
+            comboJump = 0; // รีใหม่เมื่อถึง 10
+        }
+    }
+
+    // schedule รอบถัดไป
+    const delay = Math.random() * 600 + 1200; // 1.2-1.8s
+    setTimeout(scheduleNextSet, delay);
 }
 
 function gameLoop() {
@@ -160,8 +216,7 @@ function update() {
     if (!gameRunning) return;
     score += 0.1;
     document.getElementById('score').textContent = Math.floor(score);
-    // ปรับให้เร็วขึ้นทีละน้อยกว่าเดิม
-    gameSpeed = 1.5 + (score * 0.003); // เดิม 3 + (score * 0.003)
+    gameSpeed = 1.5 + (score * 0.003);
     updateDino();
     updateObstacles();
     updateBoxes();
@@ -225,69 +280,6 @@ function updatePits() {
             pits.splice(i, 1);
         }
     }
-}
-
-// กระบองเพชรปรับขนาดใหญ่ขึ้น และเว้นระยะห่างมากขึ้น
-function spawnObstacles() {
-    if (!gameRunning) return;
-    const obstacle = {
-        x: canvas.width + 30, // ขยับให้ spawn ไกลกว่าเดิม
-        y: canvas.height - 50 - 45, // ขยับลง
-        width: 38, // <<< ใหญ่ขึ้น (เดิม 26)
-        height: 45, // <<< ใหญ่ขึ้น (เดิม 30)
-        color: '#ff006e'
-    };
-    obstacles.push(obstacle);
-
-    // Schedule next obstacle เว้นระยะมากขึ้น
-    const delay = Math.random() * 1800 + 1300;
-    setTimeout(spawnObstacles, delay);
-
-    // Combo Jump
-    comboJump++;
-    if (comboJump === 10) {
-        showAchievement("🔥 Combo 10! เก่งมาก");
-        spawnBox();
-        spawnCoin();
-        spawnPit();
-        comboJump = 0; // รีใหม่เมื่อถึง 10
-    }
-}
-
-// กล่อง: spawn ไกลกว่าเดิม
-function spawnBox() {
-    if (!gameRunning) return;
-    const box = {
-        x: canvas.width + 100,
-        y: canvas.height - 50 - 38,
-        width: 32,
-        height: 32
-    };
-    boxes.push(box);
-}
-
-// เหรียญ: spawn ไกลและสูงกว่าเดิม
-function spawnCoin() {
-    if (!gameRunning) return;
-    const coin = {
-        x: canvas.width + 180,
-        y: canvas.height - 50 - dino.height - 24,
-        width: 24,
-        height: 24
-    };
-    coins.push(coin);
-}
-
-// หลุม: spawn ไกลกว่าเดิม
-function spawnPit() {
-    if (!gameRunning) return;
-    const pit = {
-        x: canvas.width + 250,
-        y: canvas.height - 50,
-        width: 36,
-        height: 12
-    };
-    pits.push(pit);
 }
 
 function checkCollisions() {
