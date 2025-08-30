@@ -27,9 +27,9 @@ let highScore = Number(localStorage.getItem('dinoHighScore') || '0');
 
 // ปรับความเร็วเริ่มต้นให้ช้าลง
 let gameSpeed = 1.4;
-let gravity = 0.4;   // ปกติเมื่อตกลง
+let gravity = 0.5;   // ปกติเมื่อตกลง
 let slowGravity = 0.10; // กดค้างจะตกช้ากว่า
-let jumpPower = 10;
+let jumpPower = 12;
 let isHoldJump = false;
 
 let dino = {
@@ -289,7 +289,7 @@ function checkCollisions() {
             hitbox.y < obstacle.y + obstacle.height &&
             hitbox.y + hitbox.height > obstacle.y
         ) {
-            gameOver("โดนกระบองเพชร!");
+            gameOver("โดนพี่โต!");
             return;
         }
     }
