@@ -192,12 +192,12 @@ function updateObstacles() {
 function spawnObstacles() {
     if (!gameRunning) return;
 
-    // Random obstacle spawn
+    // ปรับขนาดและตำแหน่ง obstacle ให้เห็นรูปเต็ม
     const obstacle = {
         x: canvas.width,
-        y: canvas.height - 80,
-        width: 30,
-        height: 60,
+        y: canvas.height - 100, // พื้นชิดล่าง
+        width: 70,              // กว้างขึ้น
+        height: 70,             // สูงขึ้น
         color: '#ff006e'
     };
 
