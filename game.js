@@ -5,11 +5,10 @@ dinoImg.src = 'https://github.com/ARifKunG/mywebsite/blob/main/noob.png?raw=true
 const cactusImg = new Image();
 cactusImg.src = 'https://github.com/ARifKunG/mywebsite/blob/592b2ddbf88889069a39776715fccb33691ff0c8/ptoo.png?raw=true';
 
-// ใส่รูปนกของคุณ, ตัวอย่างใช้ emoji ถ้าไม่มีไฟล์จริง
+// ตัวอย่างรูปนก (เปลี่ยนเป็นไฟล์ของคุณได้)
 const birdImg = new Image();
-birdImg.src = 'https://em-content.zobj.net/source/microsoft-teams/363/bird_1f426.png'; // เปลี่ยนเป็นไฟล์ .png ใน repo ได้
+birdImg.src = 'https://em-content.zobj.net/source/microsoft-teams/363/bird_1f426.png';
 
-// Global Variables
 let gameRunning = false;
 let gameStarted = false;
 let score = 0;
@@ -21,7 +20,7 @@ let jumpPower = 12;
 // Game Objects
 let dino = {
     x: 50,
-    y: 0, // จะตั้งค่าใน resizeCanvas
+    y: 0,
     width: 60,
     height: 60,
     velocityY: 0,
@@ -32,23 +31,18 @@ let obstacles = [];
 let birds = [];
 let particles = [];
 
-// Canvas Setup
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
-// Auto-resize canvas for mobile
 function resizeCanvas() {
     const container = canvas.parentElement;
     const maxWidth = Math.min(600, container.offsetWidth - 40);
     canvas.width = maxWidth;
     canvas.height = Math.max(250, maxWidth * 0.5);
-
-    // Adjust game objects to new canvas size
     dino.y = canvas.height - dino.height - 40;
     dino.x = Math.min(50, canvas.width * 0.1);
 }
 
-// Initialize on load
 window.onload = function() {
     setTimeout(() => {
         document.getElementById('loadingScreen').style.opacity = 0;
@@ -57,15 +51,9 @@ window.onload = function() {
 
     showAchievement();
     createFloatingParticles();
-
-    // Setup canvas
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
-
-    // Update high score display
     document.getElementById('highScore').textContent = highScore;
-
-    // Draw initial game state
     drawGame();
 };
 
@@ -88,7 +76,6 @@ function createFloatingParticles() {
     }
 }
 
-// Game Functions
 function toggleDinoGame() {
     const container = document.getElementById('gameContainer');
     if (container.style.display === 'none' || container.style.display === '') {
@@ -113,7 +100,6 @@ function startGame() {
     birds = [];
     particles = [];
 
-    // Reset dino
     dino.y = canvas.height - dino.height - 40;
     dino.velocityY = 0;
     dino.jumping = false;
@@ -135,35 +121,20 @@ function gameLoop() {
 
 function update() {
     if (!gameRunning) return;
-
-    // Update score
     score += 0.1;
     document.getElementById('score').textContent = Math.floor(score);
-
-    // Increase game speed gradually
     gameSpeed = 3 + (score * 0.003);
-
-    // Update dino physics
     updateDino();
-
-    // Update obstacles and birds
     updateObstacles();
     updateBirds();
-
-    // Update particles
     updateParticles();
-
-    // Check collisions
     checkCollisions();
 }
 
 function updateDino() {
-    // Apply gravity
     if (dino.jumping) {
         dino.velocityY += gravity;
         dino.y += dino.velocityY;
-
-        // Check if landed
         if (dino.y >= canvas.height - dino.height - 40) {
             dino.y = canvas.height - dino.height - 40;
             dino.jumping = false;
@@ -176,8 +147,6 @@ function jumpDino() {
     if (!dino.jumping && gameRunning) {
         dino.jumping = true;
         dino.velocityY = -jumpPower;
-
-        // Create jump particles
         createJumpParticles();
     }
 }
@@ -200,7 +169,6 @@ function updateBirds() {
             birds[i].flapTimer = 0;
         }
         birds[i].y += birds[i].flapUp ? -1 : 1;
-
         if (birds[i].x + birds[i].width < 0) {
             birds.splice(i, 1);
         }
@@ -209,30 +177,28 @@ function updateBirds() {
 
 function spawnObstacles() {
     if (!gameRunning) return;
-
-    // ปรับขนาดและตำแหน่ง obstacle ให้เห็นรูปเต็ม
+    // ปรับขนาดเล็กลง กระโดดง่ายขึ้น!
     const obstacle = {
         x: canvas.width,
-        y: canvas.height - 70 - 40, // 40 คือระยะจากขอบล่าง
-        width: 70,
-        height: 70,
+        y: canvas.height - 40 - 35, // 35 คือความสูงใหม่
+        width: 30,  // เล็กลง จาก 70
+        height: 35, // เล็กลงจาก 70
         color: '#ff006e'
     };
 
     obstacles.push(obstacle);
 
     // Schedule next obstacle
-    const delay = Math.random() * 1200 + 700; // 0.7-1.9 seconds
+    const delay = Math.random() * 1200 + 700;
     setTimeout(spawnObstacles, delay);
 }
 
 function spawnBird() {
     if (!gameRunning) return;
-
-    // นกสุ่มความสูงและความเร็ว
+    // นกโผล่ช้าๆ นาน ๆ มาครั้ง (เช่น 7-12 วินาที)
     const bird = {
         x: canvas.width,
-        y: canvas.height - (Math.random() * 120 + 120), // สูงจากพื้นขึ้นไป
+        y: canvas.height - (Math.random() * 120 + 120),
         width: 48,
         height: 48,
         speed: Math.random() * 2 + 4,
@@ -242,13 +208,12 @@ function spawnBird() {
 
     birds.push(bird);
 
-    // Schedule next bird
-    const delay = Math.random() * 2000 + 1200;
+    // Schedule next bird (นาน ๆ มาครั้ง)
+    const delay = Math.random() * 5000 + 7000; // 7-12 วินาที
     setTimeout(spawnBird, delay);
 }
 
 function checkCollisions() {
-    // Hitbox เล็กลงเฉพาะไดโน
     let hitbox = {
         x: dino.x + dino.width * 0.15,
         y: dino.y + dino.height * 0.15,
@@ -256,7 +221,6 @@ function checkCollisions() {
         height: dino.height * 0.7,
     };
 
-    // กับกระบองเพชร
     for (let obstacle of obstacles) {
         if (
             hitbox.x < obstacle.x + obstacle.width &&
@@ -268,7 +232,6 @@ function checkCollisions() {
             return;
         }
     }
-    // กับนก
     for (let bird of birds) {
         if (
             hitbox.x < bird.x + bird.width &&
@@ -286,7 +249,6 @@ function gameOver() {
     gameRunning = false;
     document.getElementById('startBtn').textContent = 'Start Game';
 
-    // Update high score
     if (Math.floor(score) > highScore) {
         highScore = Math.floor(score);
         localStorage.setItem('dinoHighScore', highScore.toString());
@@ -294,11 +256,8 @@ function gameOver() {
         showAchievement('🏆 New High Score: ' + highScore + '!');
     }
 
-    // Show game over screen
     document.getElementById('finalScore').textContent = Math.floor(score);
     document.getElementById('gameOver').classList.add('show');
-
-    // Create explosion particles
     createExplosionParticles();
 }
 
@@ -342,9 +301,8 @@ function updateParticles() {
         let p = particles[i];
         p.x += p.velocityX;
         p.y += p.velocityY;
-        p.velocityY += 0.2; // gravity
+        p.velocityY += 0.2;
         p.life--;
-
         if (p.life <= 0) {
             particles.splice(i, 1);
         }
@@ -353,29 +311,14 @@ function updateParticles() {
 
 // Drawing Functions
 function drawGame() {
-    // Clear canvas
     ctx.fillStyle = 'rgba(10, 10, 10, 0.1)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Draw cyber grid background
     drawGrid();
-
-    // Draw ground
     drawGround();
-
-    // Draw dino
     drawDino();
-
-    // Draw obstacles
     drawObstacles();
-
-    // Draw birds
     drawBirds();
-
-    // Draw particles
     drawParticles();
-
-    // Draw UI elements if game is running
     if (gameRunning) {
         drawRunningEffects();
     }
@@ -402,17 +345,14 @@ function drawGrid() {
 
 function drawGround() {
     const groundY = canvas.height - 40;
-
     ctx.strokeStyle = '#00ff41';
     ctx.lineWidth = 3;
     ctx.shadowColor = '#00ff41';
     ctx.shadowBlur = 10;
-
     ctx.beginPath();
     ctx.moveTo(0, groundY);
     ctx.lineTo(canvas.width, groundY);
     ctx.stroke();
-
     ctx.shadowBlur = 0;
 }
 
@@ -446,9 +386,7 @@ function drawParticles() {
         ctx.fillStyle = p.color;
         ctx.shadowColor = p.color;
         ctx.shadowBlur = 5;
-
         ctx.fillRect(p.x - 2, p.y - 2, 4, 4);
-
         ctx.restore();
     }
 }
@@ -456,7 +394,6 @@ function drawParticles() {
 function drawRunningEffects() {
     ctx.strokeStyle = 'rgba(0, 255, 65, 0.3)';
     ctx.lineWidth = 2;
-
     for (let i = 0; i < 5; i++) {
         const x = (Date.now() * gameSpeed * 0.1 + i * 120) % canvas.width;
         ctx.beginPath();
@@ -499,7 +436,6 @@ canvas.addEventListener('click', function() {
     }
 });
 
-// Prevent scrolling on mobile when playing
 document.addEventListener('touchstart', function(event) {
     if (event.target === canvas) {
         event.preventDefault();
