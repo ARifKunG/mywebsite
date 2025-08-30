@@ -1,3 +1,6 @@
+const dinoImg = new Image();
+dinoImg.src = 'https://github.com/ARifKunG/mywebsite/blob/main/noob.png?raw=true'; // เปลี่ยนเป็นรูปของคุณ
+
 // Global Variables
 let gameRunning = false;
 let gameStarted = false;
@@ -295,7 +298,10 @@ function drawGame() {
     drawGround();
 
     // Draw dino
-    drawDino();
+    function drawDino() {
+    ctx.save();
+    ctx.drawImage(dinoImg, dino.x, dino.y, dino.width, dino.height);
+    ctx.restore();
 
     // Draw obstacles
     drawObstacles();
