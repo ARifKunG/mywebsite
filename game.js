@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-// --- รูปไดโนเสาร์, กระบองเพชร, กล่อง, เหรียญ, หลุม --- //
+// --- รูปไดโนเสาร์, กระบองเพชร, กล่อง, เหรียญ --- //
 const dinoImg = new Image();
 dinoImg.src = 'https://github.com/ARifKunG/mywebsite/blob/main/noob.png?raw=true';
 
@@ -12,14 +12,11 @@ boxImg.src = 'https://em-content.zobj.net/source/microsoft-teams/363/package_1f4
 const coinImg = new Image();
 coinImg.src = 'https://em-content.zobj.net/source/microsoft-teams/363/coin_1fa99.png';
 
-const pitImg = new Image();
-pitImg.src = 'https://em-content.zobj.net/source/microsoft-teams/363/hole_1faa0.png';
-
 // ---- image error fallback ----
-dinoImg.onerror = cactusImg.onerror = boxImg.onerror = coinImg.onerror = pitImg.onerror = function() {
+dinoImg.onerror = cactusImg.onerror = boxImg.onerror = coinImg.onerror = function() {
     this.broken = true;
 };
-dinoImg.onload = cactusImg.onload = boxImg.onload = coinImg.onload = pitImg.onload = function() {
+dinoImg.onload = cactusImg.onload = boxImg.onload = coinImg.onload = function() {
     this.broken = false;
 };
 
@@ -29,15 +26,17 @@ let score = 0;
 let highScore = Number(localStorage.getItem('dinoHighScore') || '0');
 
 // ปรับความเร็วเริ่มต้นให้ช้าลง
-let gameSpeed = 1.4; // ปรับช้าลงนิดนึง
-let gravity = 0.4;   // ลด gravity ให้ลอยนานขึ้น (กระโดดไกลขึ้น)
-let jumpPower = 15.5; // เพิ่ม jumpPower ให้กระโดดสูงและไกลขึ้นกว่าเดิม
+let gameSpeed = 1.4;
+let gravity = 0.4;   // ปกติเมื่อตกลง
+let slowGravity = 0.13; // กดค้างจะตกช้ากว่า
+let jumpPower = 15.5;
+let isHoldJump = false;
 
 let dino = {
     x: 70,
     y: 0,
-    width: 60,
-    height: 60,
+    width: 40,  // ลดขนาดไดโนฯนิดหน่อย (เล่นง่ายขึ้น)
+    height: 40,
     velocityY: 0,
     jumping: false,
 };
@@ -45,7 +44,6 @@ let dino = {
 let obstacles = [];
 let boxes = [];
 let coins = [];
-let pits = [];
 let particles = [];
 
 let comboJump = 0;
@@ -130,7 +128,6 @@ window.startGame = function() {
     obstacles = [];
     boxes = [];
     coins = [];
-    pits = [];
     particles = [];
     comboJump = 0;
 
@@ -146,51 +143,42 @@ window.startGame = function() {
     scheduleNextSet();
 }
 
-// เว้นระยะห่างมากๆในการ spawn อุปสรรคแต่ละชนิด (spawn 1 อย่างต่อชุด)
+// เว้นระยะห่างในการ spawn อุปสรรคแต่ละชนิด (spawn 1 อย่างต่อชุด)
 function scheduleNextSet() {
     if (!gameRunning) return;
 
-    // สมดุลช่องว่าง
-    const minGap = canvas.width * 0.42; // ต้องวิ่งได้ 42% ของจอก่อนเจอสิ่งใหม่
+    const minGap = canvas.width * 0.42;
     const maxGap = canvas.width * 0.62;
     let gap = Math.random() * (maxGap - minGap) + minGap;
 
-    // สมดุลโอกาสเจอแต่ละชนิด (cactus: 40%, box: 20%, coin: 25%, pit: 15%)
+    // สมดุลโอกาสเจอแต่ละชนิด
     let rand = Math.random();
     let type;
     if (rand < 0.4) type = 'cactus';
-    else if (rand < 0.6) type = 'box';
-    else if (rand < 0.85) type = 'coin';
-    else type = 'pit';
+    else if (rand < 0.7) type = 'box';
+    else type = 'coin';
 
     if (type === 'cactus') {
         obstacles.push({
             x: canvas.width + gap,
-            y: canvas.height - 50 - 45,
-            width: 38,
-            height: 45,
+            y: canvas.height - 50 - 28, // สูงขึ้น (ขนาดเล็กลง)
+            width: 22,                  // <<< ลดขนาด
+            height: 28,
             color: '#ff006e'
         });
     } else if (type === 'box') {
         boxes.push({
             x: canvas.width + gap,
-            y: canvas.height - 50 - 38,
-            width: 32,
-            height: 32
+            y: canvas.height - 50 - 23,
+            width: 18,                  // <<< ลดขนาด
+            height: 23
         });
     } else if (type === 'coin') {
         coins.push({
             x: canvas.width + gap,
-            y: canvas.height - 50 - dino.height - 24,
-            width: 24,
-            height: 24
-        });
-    } else if (type === 'pit') {
-        pits.push({
-            x: canvas.width + gap,
-            y: canvas.height - 50,
-            width: 36,
-            height: 12
+            y: canvas.height - 50 - dino.height - 18,
+            width: 16,
+            height: 16
         });
     }
 
@@ -202,14 +190,13 @@ function scheduleNextSet() {
         }
     }
 
-    // ถ้าเล่นง่ายไป จะ spawn 2 อย่าง (เช่น coin+obstacle) ในบางรอบได้
+    // เหรียญพิเศษในบางรอบ
     if (Math.random() < 0.2) {
-        // เพิ่มเหรียญห่างออกไปอีก 60px
         coins.push({
-            x: canvas.width + gap + 60,
-            y: canvas.height - 50 - dino.height - 20,
-            width: 24,
-            height: 24
+            x: canvas.width + gap + 40,
+            y: canvas.height - 50 - dino.height - 14,
+            width: 16,
+            height: 16
         });
     }
 
@@ -229,20 +216,20 @@ function update() {
     score += 0.1;
     document.getElementById('score').textContent = Math.floor(score);
 
-    // สมดุลความเร็ว: ค่อยๆ เร็วขึ้นแต่ไม่โหดเกิน
-    gameSpeed = 1.4 + (score * 0.0026); // เร็วขึ้นช้ากว่าเดิม
+    gameSpeed = 1.4 + (score * 0.0026);
     updateDino();
     updateObstacles();
     updateBoxes();
     updateCoins();
-    updatePits();
     updateParticles();
     checkCollisions();
 }
 
 function updateDino() {
     if (dino.jumping) {
-        dino.velocityY += gravity;
+        // ถ้ากดค้างใช้ slowGravity
+        let currentGravity = isHoldJump ? slowGravity : gravity;
+        dino.velocityY += currentGravity;
         dino.y += dino.velocityY;
         if (dino.y >= canvas.height - dino.height - 50) {
             dino.y = canvas.height - dino.height - 50;
@@ -287,15 +274,6 @@ function updateCoins() {
     }
 }
 
-function updatePits() {
-    for (let i = pits.length - 1; i >= 0; i--) {
-        pits[i].x -= gameSpeed;
-        if (pits[i].x + pits[i].width < 0) {
-            pits.splice(i, 1);
-        }
-    }
-}
-
 function checkCollisions() {
     let hitbox = {
         x: dino.x + dino.width * 0.15,
@@ -324,18 +302,6 @@ function checkCollisions() {
         ) {
             gameOver("โดนกล่อง!");
             return;
-        }
-    }
-    for (let pit of pits) {
-        if (
-            hitbox.x + hitbox.width > pit.x &&
-            hitbox.x < pit.x + pit.width &&
-            hitbox.y + hitbox.height > pit.y
-        ) {
-            if (dino.y + dino.height >= pit.y) {
-                gameOver("ตกหลุม!");
-                return;
-            }
         }
     }
     for (let i = coins.length - 1; i >= 0; i--) {
@@ -430,7 +396,6 @@ function drawGame() {
     drawObstacles();
     drawBoxes();
     drawCoins();
-    drawPits();
     drawParticles();
     if (gameRunning) {
         drawRunningEffects();
@@ -508,14 +473,6 @@ function drawCoins() {
     }
 }
 
-function drawPits() {
-    for (let pit of pits) {
-        ctx.save();
-        safeDrawImage(pitImg, pit.x, pit.y, pit.width, pit.height, '#222');
-        ctx.restore();
-    }
-}
-
 function drawParticles() {
     for (let p of particles) {
         ctx.save();
@@ -549,11 +506,13 @@ document.addEventListener('keydown', function(event) {
             startGame();
         } else {
             jumpDino();
+            isHoldJump = true;
         }
-    } else if (event.code === 'Enter') {
-        if (!gameRunning && gameStarted) {
-            restartGame();
-        }
+    }
+});
+document.addEventListener('keyup', function(event) {
+    if (event.code === 'Space') {
+        isHoldJump = false;
     }
 });
 
@@ -563,7 +522,11 @@ canvas.addEventListener('touchstart', function(event) {
         startGame();
     } else {
         jumpDino();
+        isHoldJump = true;
     }
+});
+canvas.addEventListener('touchend', function() {
+    isHoldJump = false;
 });
 
 canvas.addEventListener('click', function() {
@@ -574,22 +537,13 @@ canvas.addEventListener('click', function() {
     }
 });
 
-document.addEventListener('touchstart', function(event) {
-    if (event.target === canvas) {
-        event.preventDefault();
-    }
-}, { passive: false });
-
-document.addEventListener('touchend', function(event) {
-    if (event.target === canvas) {
-        event.preventDefault();
-    }
-}, { passive: false });
-
 document.addEventListener('touchmove', function(event) {
     if (event.target === canvas) {
         event.preventDefault();
     }
 }, { passive: false });
 
+window.addEventListener('blur', function() {
+    isHoldJump = false;
+});
 });
