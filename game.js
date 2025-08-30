@@ -1,5 +1,9 @@
+// --- รูปไดโนเสาร์และกระบองเพชร --- //
 const dinoImg = new Image();
-dinoImg.src = 'https://github.com/ARifKunG/mywebsite/blob/main/noob.png?raw=true'; // เปลี่ยนเป็นรูปของคุณ
+dinoImg.src = 'https://github.com/ARifKunG/mywebsite/blob/main/noob.png?raw=true';
+
+const cactusImg = new Image();
+cactusImg.src = "https://github.com/ARifKunG/mywebsite/blob/592b2ddbf88889069a39776715fccb33691ff0c8/ptoo.png?raw=true";
 
 // Global Variables
 let gameRunning = false;
@@ -298,10 +302,7 @@ function drawGame() {
     drawGround();
 
     // Draw dino
-    function drawDino() {
-    ctx.save();
-    ctx.drawImage(dinoImg, dino.x, dino.y, dino.width, dino.height);
-    ctx.restore();
+    drawDino();
 
     // Draw obstacles
     drawObstacles();
@@ -353,55 +354,18 @@ function drawGround() {
     ctx.shadowBlur = 0;
 }
 
-// ----------- จุดแก้ไขรูปภาพไดโนเสาร์ (ดูที่ drawDino) -----------
+// --- วาดไดโนเสาร์ด้วยรูป noob.png --- //
 function drawDino() {
     ctx.save();
-    // ถ้าอยากให้ใช้รูปภาพจริง ให้แทนที่โค้ดด้านล่างด้วย ctx.drawImage(img, dino.x, dino.y, dino.width, dino.height)
-    // เช่น:
-    // let img = new Image();
-    // img.src = 'ลิงก์รูปภาพ.png';
-    // ctx.drawImage(img, dino.x, dino.y, dino.width, dino.height);
-
-    // วาดตัว dino (ดีไซน์ปัจจุบันเป็นสี่เหลี่ยม+ตา+ขา)
-    ctx.shadowColor = dino.color;
-    ctx.shadowBlur = 15;
-    ctx.fillStyle = dino.color;
-    ctx.fillRect(dino.x, dino.y, dino.width, dino.height);
-
-    // Dino details
-    ctx.fillStyle = '#ffffff';
-    // Eyes
-    ctx.fillRect(dino.x + 8, dino.y + 8, 6, 6);
-    ctx.fillRect(dino.x + 20, dino.y + 8, 6, 6);
-    // Mouth
-    ctx.fillRect(dino.x + 5, dino.y + 25, 15, 3);
-
-    // Legs (if not jumping)
-    if (!dino.jumping) {
-        ctx.fillStyle = dino.color;
-        ctx.fillRect(dino.x + 5, dino.y + dino.height, 8, 10);
-        ctx.fillRect(dino.x + 25, dino.y + dino.height, 8, 10);
-    }
+    ctx.drawImage(dinoImg, dino.x, dino.y, dino.width, dino.height);
     ctx.restore();
 }
-// ----------- จบจุดแก้ไขรูปภาพไดโนเสาร์ -----------
 
+// --- วาดกระบองเพชรด้วยรูป ptoo.png --- //
 function drawObstacles() {
     for (let obstacle of obstacles) {
         ctx.save();
-        ctx.shadowColor = obstacle.color;
-        ctx.shadowBlur = 10;
-
-        ctx.fillStyle = obstacle.color;
-        ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
-
-        // Spikes
-        ctx.fillStyle = '#ffffff';
-        for (let i = 0; i < 3; i++) {
-            const spikeY = obstacle.y + (i * 20) + 10;
-            ctx.fillRect(obstacle.x - 5, spikeY, 10, 3);
-            ctx.fillRect(obstacle.x + obstacle.width - 5, spikeY, 10, 3);
-        }
+        ctx.drawImage(cactusImg, obstacle.x, obstacle.y, obstacle.width, obstacle.height);
         ctx.restore();
     }
 }
