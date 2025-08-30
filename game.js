@@ -1,9 +1,13 @@
-// --- รูปไดโนเสาร์และกระบองเพชร --- //
+// --- รูปไดโนเสาร์, กระบองเพชร, นก --- //
 const dinoImg = new Image();
 dinoImg.src = 'https://github.com/ARifKunG/mywebsite/blob/main/noob.png?raw=true';
 
 const cactusImg = new Image();
-cactusImg.src = "https://github.com/ARifKunG/mywebsite/blob/592b2ddbf88889069a39776715fccb33691ff0c8/ptoo.png?raw=true";
+cactusImg.src = 'https://github.com/ARifKunG/mywebsite/blob/592b2ddbf88889069a39776715fccb33691ff0c8/ptoo.png?raw=true';
+
+// ใส่รูปนกของคุณ, ตัวอย่างใช้ emoji ถ้าไม่มีไฟล์จริง
+const birdImg = new Image();
+birdImg.src = 'https://em-content.zobj.net/source/microsoft-teams/363/bird_1f426.png'; // เปลี่ยนเป็นไฟล์ .png ใน repo ได้
 
 // Global Variables
 let gameRunning = false;
@@ -17,15 +21,15 @@ let jumpPower = 12;
 // Game Objects
 let dino = {
     x: 50,
-    y: 200,
-    width: 40,
-    height: 40,
+    y: 0, // จะตั้งค่าใน resizeCanvas
+    width: 60,
+    height: 60,
     velocityY: 0,
     jumping: false,
-    color: '#00ff41'
 };
 
 let obstacles = [];
+let birds = [];
 let particles = [];
 
 // Canvas Setup
@@ -40,7 +44,7 @@ function resizeCanvas() {
     canvas.height = Math.max(250, maxWidth * 0.5);
 
     // Adjust game objects to new canvas size
-    dino.y = canvas.height - 100;
+    dino.y = canvas.height - dino.height - 40;
     dino.x = Math.min(50, canvas.width * 0.1);
 }
 
@@ -106,10 +110,11 @@ function startGame() {
     score = 0;
     gameSpeed = 3;
     obstacles = [];
+    birds = [];
     particles = [];
 
     // Reset dino
-    dino.y = canvas.height - 100;
+    dino.y = canvas.height - dino.height - 40;
     dino.velocityY = 0;
     dino.jumping = false;
 
@@ -118,14 +123,13 @@ function startGame() {
 
     gameLoop();
     spawnObstacles();
+    spawnBird();
 }
 
 function gameLoop() {
     if (!gameRunning) return;
-
     update();
     drawGame();
-
     requestAnimationFrame(gameLoop);
 }
 
@@ -142,8 +146,9 @@ function update() {
     // Update dino physics
     updateDino();
 
-    // Update obstacles
+    // Update obstacles and birds
     updateObstacles();
+    updateBirds();
 
     // Update particles
     updateParticles();
@@ -159,8 +164,8 @@ function updateDino() {
         dino.y += dino.velocityY;
 
         // Check if landed
-        if (dino.y >= canvas.height - 100) {
-            dino.y = canvas.height - 100;
+        if (dino.y >= canvas.height - dino.height - 40) {
+            dino.y = canvas.height - dino.height - 40;
             dino.jumping = false;
             dino.velocityY = 0;
         }
@@ -178,13 +183,26 @@ function jumpDino() {
 }
 
 function updateObstacles() {
-    // Move obstacles
     for (let i = obstacles.length - 1; i >= 0; i--) {
         obstacles[i].x -= gameSpeed;
-
-        // Remove obstacles that are off screen
         if (obstacles[i].x + obstacles[i].width < 0) {
             obstacles.splice(i, 1);
+        }
+    }
+}
+
+function updateBirds() {
+    for (let i = birds.length - 1; i >= 0; i--) {
+        birds[i].x -= birds[i].speed;
+        birds[i].flapTimer++;
+        if (birds[i].flapTimer > 20) {
+            birds[i].flapUp = !birds[i].flapUp;
+            birds[i].flapTimer = 0;
+        }
+        birds[i].y += birds[i].flapUp ? -1 : 1;
+
+        if (birds[i].x + birds[i].width < 0) {
+            birds.splice(i, 1);
         }
     }
 }
@@ -195,27 +213,71 @@ function spawnObstacles() {
     // ปรับขนาดและตำแหน่ง obstacle ให้เห็นรูปเต็ม
     const obstacle = {
         x: canvas.width,
-        y: canvas.height - 100, // พื้นชิดล่าง
-        width: 70,              // กว้างขึ้น
-        height: 70,             // สูงขึ้น
+        y: canvas.height - 70 - 40, // 40 คือระยะจากขอบล่าง
+        width: 70,
+        height: 70,
         color: '#ff006e'
     };
 
     obstacles.push(obstacle);
 
     // Schedule next obstacle
-    const delay = Math.random() * 2000 + 1500; // 1.5-3.5 seconds
+    const delay = Math.random() * 1200 + 700; // 0.7-1.9 seconds
     setTimeout(spawnObstacles, delay);
 }
 
+function spawnBird() {
+    if (!gameRunning) return;
+
+    // นกสุ่มความสูงและความเร็ว
+    const bird = {
+        x: canvas.width,
+        y: canvas.height - (Math.random() * 120 + 120), // สูงจากพื้นขึ้นไป
+        width: 48,
+        height: 48,
+        speed: Math.random() * 2 + 4,
+        flapUp: Math.random() > 0.5,
+        flapTimer: 0
+    };
+
+    birds.push(bird);
+
+    // Schedule next bird
+    const delay = Math.random() * 2000 + 1200;
+    setTimeout(spawnBird, delay);
+}
+
 function checkCollisions() {
+    // Hitbox เล็กลงเฉพาะไดโน
+    let hitbox = {
+        x: dino.x + dino.width * 0.15,
+        y: dino.y + dino.height * 0.15,
+        width: dino.width * 0.7,
+        height: dino.height * 0.7,
+    };
+
+    // กับกระบองเพชร
     for (let obstacle of obstacles) {
-        if (dino.x < obstacle.x + obstacle.width &&
-            dino.x + dino.width > obstacle.x &&
-            dino.y < obstacle.y + obstacle.height &&
-            dino.y + dino.height > obstacle.y) {
+        if (
+            hitbox.x < obstacle.x + obstacle.width &&
+            hitbox.x + hitbox.width > obstacle.x &&
+            hitbox.y < obstacle.y + obstacle.height &&
+            hitbox.y + hitbox.height > obstacle.y
+        ) {
             gameOver();
-            break;
+            return;
+        }
+    }
+    // กับนก
+    for (let bird of birds) {
+        if (
+            hitbox.x < bird.x + bird.width &&
+            hitbox.x + hitbox.width > bird.x &&
+            hitbox.y < bird.y + bird.height &&
+            hitbox.y + hitbox.height > bird.y
+        ) {
+            gameOver();
+            return;
         }
     }
 }
@@ -307,6 +369,9 @@ function drawGame() {
     // Draw obstacles
     drawObstacles();
 
+    // Draw birds
+    drawBirds();
+
     // Draw particles
     drawParticles();
 
@@ -320,7 +385,6 @@ function drawGrid() {
     ctx.strokeStyle = 'rgba(0, 255, 65, 0.1)';
     ctx.lineWidth = 1;
 
-    // Vertical lines
     for (let x = 0; x < canvas.width; x += 40) {
         ctx.beginPath();
         ctx.moveTo(x, 0);
@@ -328,7 +392,6 @@ function drawGrid() {
         ctx.stroke();
     }
 
-    // Horizontal lines
     for (let y = 0; y < canvas.height; y += 40) {
         ctx.beginPath();
         ctx.moveTo(0, y);
@@ -338,9 +401,8 @@ function drawGrid() {
 }
 
 function drawGround() {
-    const groundY = canvas.height - 50;
+    const groundY = canvas.height - 40;
 
-    // Ground line with glow effect
     ctx.strokeStyle = '#00ff41';
     ctx.lineWidth = 3;
     ctx.shadowColor = '#00ff41';
@@ -354,18 +416,24 @@ function drawGround() {
     ctx.shadowBlur = 0;
 }
 
-// --- วาดไดโนเสาร์ด้วยรูป noob.png --- //
 function drawDino() {
     ctx.save();
     ctx.drawImage(dinoImg, dino.x, dino.y, dino.width, dino.height);
     ctx.restore();
 }
 
-// --- วาดกระบองเพชรด้วยรูป ptoo.png --- //
 function drawObstacles() {
     for (let obstacle of obstacles) {
         ctx.save();
         ctx.drawImage(cactusImg, obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+        ctx.restore();
+    }
+}
+
+function drawBirds() {
+    for (let bird of birds) {
+        ctx.save();
+        ctx.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height);
         ctx.restore();
     }
 }
@@ -414,7 +482,6 @@ document.addEventListener('keydown', function(event) {
     }
 });
 
-// Touch/Click events for mobile
 canvas.addEventListener('touchstart', function(event) {
     event.preventDefault();
     if (!gameStarted) {
