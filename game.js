@@ -29,7 +29,7 @@ let highScore = Number(localStorage.getItem('dinoHighScore') || '0');
 let gameSpeed = 1.4;
 let gravity = 0.4;   // ปกติเมื่อตกลง
 let slowGravity = 0.13; // กดค้างจะตกช้ากว่า
-let jumpPower = 15.5;
+let jumpPower = 5;
 let isHoldJump = false;
 
 let dino = {
