@@ -6,13 +6,13 @@ const cactusImg = new Image();
 cactusImg.src = 'https://github.com/ARifKunG/mywebsite/blob/592b2ddbf88889069a39776715fccb33691ff0c8/ptoo.png?raw=true';
 
 const boxImg = new Image();
-boxImg.src = 'https://em-content.zobj.net/source/microsoft-teams/363/package_1f4e6.png'; // เปลี่ยนเป็นไฟล์ png ของคุณได้
+boxImg.src = 'https://em-content.zobj.net/source/microsoft-teams/363/package_1f4e6.png';
 
 const coinImg = new Image();
-coinImg.src = 'https://em-content.zobj.net/source/microsoft-teams/363/coin_1fa99.png'; // เปลี่ยนเป็นไฟล์ png ของคุณได้
+coinImg.src = 'https://em-content.zobj.net/source/microsoft-teams/363/coin_1fa99.png';
 
 const pitImg = new Image();
-pitImg.src = 'https://em-content.zobj.net/source/microsoft-teams/363/hole_1faa0.png'; // เปลี่ยนเป็นไฟล์ png ของคุณได้
+pitImg.src = 'https://em-content.zobj.net/source/microsoft-teams/363/hole_1faa0.png';
 
 let gameRunning = false;
 let gameStarted = false;
@@ -95,6 +95,19 @@ function createFloatingParticles() {
         p.style.animationDelay = (Math.random() * 8) + 's';
         p.style.background = (Math.random() > 0.6) ? '#ff006e' : ((Math.random() > 0.3) ? '#8338ec' : '#00ff41');
         particleContainer.appendChild(p);
+    }
+}
+
+function toggleDinoGame() {
+    const container = document.getElementById('gameContainer');
+    if (container.style.display === 'none' || container.style.display === '') {
+        container.style.display = 'flex';
+        resizeCanvas();
+    } else {
+        container.style.display = 'none';
+        if (gameRunning) {
+            gameOver();
+        }
     }
 }
 
