@@ -28,8 +28,8 @@ let highScore = Number(localStorage.getItem('dinoHighScore') || '0');
 // ปรับความเร็วเริ่มต้นให้ช้าลง
 let gameSpeed = 1.4;
 let gravity = 0.4;   // ปกติเมื่อตกลง
-let slowGravity = 0.13; // กดค้างจะตกช้ากว่า
-let jumpPower = 5;
+let slowGravity = 0.10; // กดค้างจะตกช้ากว่า
+let jumpPower = 2;
 let isHoldJump = false;
 
 let dino = {
@@ -48,12 +48,12 @@ let particles = [];
 
 let comboJump = 0;
 let memePool = [
-    "ไม่เป็นไรนะ! ไดโนยังมีพรุ่งนี้",
-    "แพ้ก็แค่เกม แต่เราคือผู้ชนะในใจ",
-    "Next time will be better! 🦖",
-    "ฮ่าๆๆ พลาดหน่อยก็ไม่เป็นไร",
-    "บอกเลยว่าคุณเก่งมาก 😉",
-    "Meme: ไดโนร้องไห้ 😢"
+    "ไม่เป็นไรนะ! กย์วันนี้ พรุ่งนี้ ก็ เกย์ ",
+    "แพ้ก็แค่เกย์ คือเกย์ ในใจ",
+    "Next time will be better! ",
+    "ฮ่าๆๆ พลาดหน่อยก็เกย์อยู่ดี ",
+    "บอกเลยว่าคุณโครตเกย์ 😉",
+    " เกย์จริงๆ😢"
 ];
 
 const canvas = document.getElementById('gameCanvas');
