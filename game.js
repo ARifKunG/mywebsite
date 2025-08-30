@@ -1,3 +1,4 @@
+document.addEventListener('DOMContentLoaded', function() {
 // --- รูปไดโนเสาร์, กระบองเพชร, กล่อง, เหรียญ, หลุม --- //
 const dinoImg = new Image();
 dinoImg.src = 'https://github.com/ARifKunG/mywebsite/blob/main/noob.png?raw=true';
@@ -59,18 +60,17 @@ function resizeCanvas() {
     dino.x = Math.min(50, canvas.width * 0.1);
 }
 
-window.onload = function() {
-    setTimeout(() => {
-        document.getElementById('loadingScreen').style.opacity = 0;
-        setTimeout(() => document.getElementById('loadingScreen').style.display = 'none', 500);
-    }, 1400);
-    showAchievement();
-    createFloatingParticles();
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-    document.getElementById('highScore').textContent = highScore;
-    drawGame();
-};
+setTimeout(() => {
+    document.getElementById('loadingScreen').style.opacity = 0;
+    setTimeout(() => document.getElementById('loadingScreen').style.display = 'none', 500);
+}, 1400);
+
+showAchievement();
+createFloatingParticles();
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+document.getElementById('highScore').textContent = highScore;
+drawGame();
 
 function showAchievement(text = '🏆 Achievement Unlocked: Welcome Gamer!') {
     const ach = document.getElementById('achievement');
@@ -98,7 +98,7 @@ function createFloatingParticles() {
     }
 }
 
-function toggleDinoGame() {
+window.toggleDinoGame = function() {
     const container = document.getElementById('gameContainer');
     if (container.style.display === 'none' || container.style.display === '') {
         container.style.display = 'flex';
@@ -111,7 +111,7 @@ function toggleDinoGame() {
     }
 }
 
-function startGame() {
+window.startGame = function() {
     if (gameRunning) return;
     gameRunning = true;
     gameStarted = true;
@@ -172,7 +172,7 @@ function updateDino() {
     }
 }
 
-function jumpDino() {
+window.jumpDino = function() {
     if (!dino.jumping && gameRunning) {
         dino.jumping = true;
         dino.velocityY = -jumpPower;
@@ -358,7 +358,7 @@ function gameOver(reason = "") {
     showMeme(memeMsg);
 }
 
-function restartGame() {
+window.restartGame = function() {
     gameRunning = false;
     gameStarted = false;
     document.getElementById('gameOver').classList.remove('show');
@@ -567,3 +567,5 @@ document.addEventListener('touchmove', function(event) {
         event.preventDefault();
     }
 }, { passive: false });
+
+});
