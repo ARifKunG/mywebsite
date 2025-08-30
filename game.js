@@ -29,9 +29,9 @@ let score = 0;
 let highScore = Number(localStorage.getItem('dinoHighScore') || '0');
 
 // ปรับความเร็วเริ่มต้นให้ช้าลง
-let gameSpeed = 1.5;
-let gravity = 0.5;
-let jumpPower = 12;
+let gameSpeed = 1.4; // ปรับช้าลงนิดนึง
+let gravity = 0.4;   // ลด gravity ให้ลอยนานขึ้น (กระโดดไกลขึ้น)
+let jumpPower = 15.5; // เพิ่ม jumpPower ให้กระโดดสูงและไกลขึ้นกว่าเดิม
 
 let dino = {
     x: 70,
@@ -126,7 +126,7 @@ window.startGame = function() {
     gameRunning = true;
     gameStarted = true;
     score = 0;
-    gameSpeed = 1.5;
+    gameSpeed = 1.4;
     obstacles = [];
     boxes = [];
     coins = [];
@@ -143,23 +143,26 @@ window.startGame = function() {
     document.getElementById('memeMsg').classList.remove('show');
 
     gameLoop();
-    scheduleNextSet(); // เปลี่ยนจาก spawnObstacles แบบเดิม
+    scheduleNextSet();
 }
 
-// เว้นระยะห่างมากๆในการ spawn อุปสรรคแต่ละชนิด (แต่ละรอบสุ่มว่าจะเจออะไร)
+// เว้นระยะห่างมากๆในการ spawn อุปสรรคแต่ละชนิด (spawn 1 อย่างต่อชุด)
 function scheduleNextSet() {
     if (!gameRunning) return;
 
-    // เว้นช่องว่างสุ่มแต่ละชุด (ระยะห่างเยอะ)
-    const minGap = canvas.width * 0.4; // ต้องวิ่งได้ 40% ของจอก่อนเจอสิ่งใหม่
-    const maxGap = canvas.width * 0.65; // สูงสุด 65%
+    // สมดุลช่องว่าง
+    const minGap = canvas.width * 0.42; // ต้องวิ่งได้ 42% ของจอก่อนเจอสิ่งใหม่
+    const maxGap = canvas.width * 0.62;
     let gap = Math.random() * (maxGap - minGap) + minGap;
 
-    // สุ่มว่าจะ spawn อะไร (แค่ 1 อย่างในแต่ละรอบ)
-    let choices = ['cactus', 'box', 'coin', 'pit'];
-    let type = choices[Math.floor(Math.random() * choices.length)];
+    // สมดุลโอกาสเจอแต่ละชนิด (cactus: 40%, box: 20%, coin: 25%, pit: 15%)
+    let rand = Math.random();
+    let type;
+    if (rand < 0.4) type = 'cactus';
+    else if (rand < 0.6) type = 'box';
+    else if (rand < 0.85) type = 'coin';
+    else type = 'pit';
 
-    // จะไม่ spawn ซ้อนกัน
     if (type === 'cactus') {
         obstacles.push({
             x: canvas.width + gap,
@@ -191,17 +194,26 @@ function scheduleNextSet() {
         });
     }
 
-    // เพิ่ม comboJump เฉพาะ cactus/box/pit
     if (type !== 'coin') {
         comboJump++;
         if (comboJump === 10) {
             showAchievement("🔥 Combo 10! เก่งมาก");
-            comboJump = 0; // รีใหม่เมื่อถึง 10
+            comboJump = 0;
         }
     }
 
-    // schedule รอบถัดไป
-    const delay = Math.random() * 600 + 1200; // 1.2-1.8s
+    // ถ้าเล่นง่ายไป จะ spawn 2 อย่าง (เช่น coin+obstacle) ในบางรอบได้
+    if (Math.random() < 0.2) {
+        // เพิ่มเหรียญห่างออกไปอีก 60px
+        coins.push({
+            x: canvas.width + gap + 60,
+            y: canvas.height - 50 - dino.height - 20,
+            width: 24,
+            height: 24
+        });
+    }
+
+    const delay = Math.random() * 600 + 1200;
     setTimeout(scheduleNextSet, delay);
 }
 
@@ -216,7 +228,9 @@ function update() {
     if (!gameRunning) return;
     score += 0.1;
     document.getElementById('score').textContent = Math.floor(score);
-    gameSpeed = 1.5 + (score * 0.003);
+
+    // สมดุลความเร็ว: ค่อยๆ เร็วขึ้นแต่ไม่โหดเกิน
+    gameSpeed = 1.4 + (score * 0.0026); // เร็วขึ้นช้ากว่าเดิม
     updateDino();
     updateObstacles();
     updateBoxes();
