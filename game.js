@@ -15,6 +15,14 @@ coinImg.src = 'https://em-content.zobj.net/source/microsoft-teams/363/coin_1fa99
 const pitImg = new Image();
 pitImg.src = 'https://em-content.zobj.net/source/microsoft-teams/363/hole_1faa0.png';
 
+// ---- image error fallback ----
+dinoImg.onerror = cactusImg.onerror = boxImg.onerror = coinImg.onerror = pitImg.onerror = function() {
+    this.broken = true;
+};
+dinoImg.onload = cactusImg.onload = boxImg.onload = coinImg.onload = pitImg.onload = function() {
+    this.broken = false;
+};
+
 let gameRunning = false;
 let gameStarted = false;
 let score = 0;
@@ -454,16 +462,29 @@ function drawGround() {
     ctx.shadowBlur = 0;
 }
 
+function safeDrawImage(img, x, y, w, h, fallbackColor = '#333') {
+    // เช็คสถานะรูปว่าพร้อมวาด
+    if (img && img.complete && img.naturalWidth !== 0 && !img.broken) {
+        ctx.drawImage(img, x, y, w, h);
+    } else {
+        // รูปเสีย/โหลดไม่สำเร็จ ใช้ fallback เป็นกล่องสี
+        ctx.save();
+        ctx.fillStyle = fallbackColor;
+        ctx.fillRect(x, y, w, h);
+        ctx.restore();
+    }
+}
+
 function drawDino() {
     ctx.save();
-    ctx.drawImage(dinoImg, dino.x, dino.y, dino.width, dino.height);
+    safeDrawImage(dinoImg, dino.x, dino.y, dino.width, dino.height, '#00ff41');
     ctx.restore();
 }
 
 function drawObstacles() {
     for (let obstacle of obstacles) {
         ctx.save();
-        ctx.drawImage(cactusImg, obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+        safeDrawImage(cactusImg, obstacle.x, obstacle.y, obstacle.width, obstacle.height, '#ff006e');
         ctx.restore();
     }
 }
@@ -471,7 +492,7 @@ function drawObstacles() {
 function drawBoxes() {
     for (let box of boxes) {
         ctx.save();
-        ctx.drawImage(boxImg, box.x, box.y, box.width, box.height);
+        safeDrawImage(boxImg, box.x, box.y, box.width, box.height, '#f5c16c');
         ctx.restore();
     }
 }
@@ -479,7 +500,7 @@ function drawBoxes() {
 function drawCoins() {
     for (let coin of coins) {
         ctx.save();
-        ctx.drawImage(coinImg, coin.x, coin.y, coin.width, coin.height);
+        safeDrawImage(coinImg, coin.x, coin.y, coin.width, coin.height, '#f7d700');
         ctx.restore();
     }
 }
@@ -487,7 +508,7 @@ function drawCoins() {
 function drawPits() {
     for (let pit of pits) {
         ctx.save();
-        ctx.drawImage(pitImg, pit.x, pit.y, pit.width, pit.height);
+        safeDrawImage(pitImg, pit.x, pit.y, pit.width, pit.height, '#222');
         ctx.restore();
     }
 }
