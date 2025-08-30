@@ -1,13 +1,18 @@
-// --- รูปไดโนเสาร์, กระบองเพชร, นก --- //
+// --- รูปไดโนเสาร์, กระบองเพชร, กล่อง, เหรียญ, หลุม --- //
 const dinoImg = new Image();
 dinoImg.src = 'https://github.com/ARifKunG/mywebsite/blob/main/noob.png?raw=true';
 
 const cactusImg = new Image();
 cactusImg.src = 'https://github.com/ARifKunG/mywebsite/blob/592b2ddbf88889069a39776715fccb33691ff0c8/ptoo.png?raw=true';
 
-// ตัวอย่างรูปนก (เปลี่ยนเป็นไฟล์ของคุณได้)
-const birdImg = new Image();
-birdImg.src = 'https://em-content.zobj.net/source/microsoft-teams/363/bird_1f426.png';
+const boxImg = new Image();
+boxImg.src = 'https://em-content.zobj.net/source/microsoft-teams/363/package_1f4e6.png'; // เปลี่ยนเป็นไฟล์ png ของคุณได้
+
+const coinImg = new Image();
+coinImg.src = 'https://em-content.zobj.net/source/microsoft-teams/363/coin_1fa99.png'; // เปลี่ยนเป็นไฟล์ png ของคุณได้
+
+const pitImg = new Image();
+pitImg.src = 'https://em-content.zobj.net/source/microsoft-teams/363/hole_1faa0.png'; // เปลี่ยนเป็นไฟล์ png ของคุณได้
 
 let gameRunning = false;
 let gameStarted = false;
@@ -17,7 +22,6 @@ let gameSpeed = 3;
 let gravity = 0.5;
 let jumpPower = 12;
 
-// Game Objects
 let dino = {
     x: 50,
     y: 0,
@@ -28,8 +32,20 @@ let dino = {
 };
 
 let obstacles = [];
-let birds = [];
+let boxes = [];
+let coins = [];
+let pits = [];
 let particles = [];
+
+let comboJump = 0;
+let memePool = [
+    "ไม่เป็นไรนะ! ไดโนยังมีพรุ่งนี้",
+    "แพ้ก็แค่เกม แต่เราคือผู้ชนะในใจ",
+    "Next time will be better! 🦖",
+    "ฮ่าๆๆ พลาดหน่อยก็ไม่เป็นไร",
+    "บอกเลยว่าคุณเก่งมาก 😉",
+    "Meme: ไดโนร้องไห้ 😢"
+];
 
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
@@ -48,7 +64,6 @@ window.onload = function() {
         document.getElementById('loadingScreen').style.opacity = 0;
         setTimeout(() => document.getElementById('loadingScreen').style.display = 'none', 500);
     }, 1400);
-
     showAchievement();
     createFloatingParticles();
     resizeCanvas();
@@ -64,6 +79,13 @@ function showAchievement(text = '🏆 Achievement Unlocked: Welcome Gamer!') {
     setTimeout(() => ach.classList.remove('show'), 3500);
 }
 
+function showMeme(text) {
+    const meme = document.getElementById('memeMsg');
+    meme.textContent = text;
+    meme.classList.add('show');
+    setTimeout(() => meme.classList.remove('show'), 3500);
+}
+
 function createFloatingParticles() {
     const particleContainer = document.getElementById('particles');
     for (let i = 0; i < 32; i++) {
@@ -76,29 +98,18 @@ function createFloatingParticles() {
     }
 }
 
-function toggleDinoGame() {
-    const container = document.getElementById('gameContainer');
-    if (container.style.display === 'none' || container.style.display === '') {
-        container.style.display = 'flex';
-        resizeCanvas();
-    } else {
-        container.style.display = 'none';
-        if (gameRunning) {
-            gameOver();
-        }
-    }
-}
-
 function startGame() {
     if (gameRunning) return;
-
     gameRunning = true;
     gameStarted = true;
     score = 0;
     gameSpeed = 3;
     obstacles = [];
-    birds = [];
+    boxes = [];
+    coins = [];
+    pits = [];
     particles = [];
+    comboJump = 0;
 
     dino.y = canvas.height - dino.height - 40;
     dino.velocityY = 0;
@@ -106,10 +117,13 @@ function startGame() {
 
     document.getElementById('startBtn').textContent = 'Running...';
     document.getElementById('gameOver').classList.remove('show');
+    document.getElementById('memeMsg').classList.remove('show');
 
     gameLoop();
     spawnObstacles();
-    spawnBird();
+    spawnBox();
+    spawnCoin();
+    spawnPit();
 }
 
 function gameLoop() {
@@ -126,7 +140,9 @@ function update() {
     gameSpeed = 3 + (score * 0.003);
     updateDino();
     updateObstacles();
-    updateBirds();
+    updateBoxes();
+    updateCoins();
+    updatePits();
     updateParticles();
     checkCollisions();
 }
@@ -160,18 +176,29 @@ function updateObstacles() {
     }
 }
 
-function updateBirds() {
-    for (let i = birds.length - 1; i >= 0; i--) {
-        birds[i].x -= birds[i].speed;
-        birds[i].flapTimer++;
-        if (birds[i].flapTimer > 20) {
-            birds[i].flapUp = !birds[i].flapUp;
-            birds[i].flapTimer = 0;
+function updateBoxes() {
+    for (let i = boxes.length - 1; i >= 0; i--) {
+        boxes[i].x -= gameSpeed;
+        if (boxes[i].x + boxes[i].width < 0) {
+            boxes.splice(i, 1);
         }
-        // นกบินระดับเดียวกับที่ไดโนกระโดดสูงสุด (ไม่มีแกว่ง)
-        birds[i].y = getBirdFlyingY();
-        if (birds[i].x + birds[i].width < 0) {
-            birds.splice(i, 1);
+    }
+}
+
+function updateCoins() {
+    for (let i = coins.length - 1; i >= 0; i--) {
+        coins[i].x -= gameSpeed;
+        if (coins[i].x + coins[i].width < 0) {
+            coins.splice(i, 1);
+        }
+    }
+}
+
+function updatePits() {
+    for (let i = pits.length - 1; i >= 0; i--) {
+        pits[i].x -= gameSpeed;
+        if (pits[i].x + pits[i].width < 0) {
+            pits.splice(i, 1);
         }
     }
 }
@@ -179,7 +206,6 @@ function updateBirds() {
 // กระบองเพชรเล็ก ระยะห่างเยอะ เล่นง่าย
 function spawnObstacles() {
     if (!gameRunning) return;
-    // ขนาดเล็ก กระโดดง่าย
     const obstacle = {
         x: canvas.width,
         y: canvas.height - 40 - 30,
@@ -187,42 +213,57 @@ function spawnObstacles() {
         height: 30,
         color: '#ff006e'
     };
-
     obstacles.push(obstacle);
 
     // Schedule next obstacle (ระยะห่างเยอะขึ้น)
-    const delay = Math.random() * 1500 + 1100; // 1.1-2.6 วินาที
+    const delay = Math.random() * 1500 + 1100;
     setTimeout(spawnObstacles, delay);
+
+    // Combo Jump
+    comboJump++;
+    if (comboJump === 10) {
+        showAchievement("🔥 Combo 10! เก่งมาก");
+        spawnBox();
+        spawnCoin();
+        spawnPit();
+        comboJump = 0; // รีใหม่เมื่อถึง 10
+    }
 }
 
-// นกจะบินระดับเดียวกับจุดสูงสุดที่ไดโนกระโดดได้
-function spawnBird() {
+// กล่อง: ต้องกระโดดข้ามหรือเลี่ยง
+function spawnBox() {
     if (!gameRunning) return;
-    const bird = {
-        x: canvas.width,
-        y: getBirdFlyingY(),
-        width: 48,
-        height: 48,
-        speed: Math.random() * 2 + 4,
-        flapUp: false,
-        flapTimer: 0
+    const box = {
+        x: canvas.width + 80,
+        y: canvas.height - 40 - 32,
+        width: 32,
+        height: 32
     };
-    birds.push(bird);
-
-    // นาน ๆ มาครั้ง
-    const delay = Math.random() * 7000 + 8000; // 8-15 วินาที
-    setTimeout(spawnBird, delay);
+    boxes.push(box);
 }
 
-// คำนวณ y ที่นกบิน (ระดับเดียวกับจุดสูงสุดที่ไดโนกระโดดได้)
-function getBirdFlyingY() {
-    // จุดพื้น ground = canvas.height - 40
-    // จุดสูงสุดที่ไดโนจะไปถึง = ground - jumpPower * jumpPower / (2*gravity)
-    // แต่เนื่องจาก dino เริ่มกระโดดจาก ground - dino.height
-    // (ใช้สูตร s = v^2/(2g))
-    const groundY = canvas.height - 40;
-    const jumpHeight = (jumpPower * jumpPower) / (2 * gravity);
-    return groundY - dino.height - jumpHeight - 10; // -10 buffer ให้ชนง่ายขึ้น
+// เหรียญ: กระโดดเก็บได้ (วางสูงขึ้น)
+function spawnCoin() {
+    if (!gameRunning) return;
+    const coin = {
+        x: canvas.width + 150,
+        y: canvas.height - 40 - dino.height - 20,
+        width: 24,
+        height: 24
+    };
+    coins.push(coin);
+}
+
+// หลุม: ต้องกระโดดข้าม (วางติดพื้น)
+function spawnPit() {
+    if (!gameRunning) return;
+    const pit = {
+        x: canvas.width + 220,
+        y: canvas.height - 40,
+        width: 36,
+        height: 12
+    };
+    pits.push(pit);
 }
 
 function checkCollisions() {
@@ -240,43 +281,75 @@ function checkCollisions() {
             hitbox.y < obstacle.y + obstacle.height &&
             hitbox.y + hitbox.height > obstacle.y
         ) {
-            gameOver();
+            gameOver("โดนกระบองเพชร!");
             return;
         }
     }
-    for (let bird of birds) {
+    for (let box of boxes) {
         if (
-            hitbox.x < bird.x + bird.width &&
-            hitbox.x + hitbox.width > bird.x &&
-            hitbox.y < bird.y + bird.height &&
-            hitbox.y + hitbox.height > bird.y
+            hitbox.x < box.x + box.width &&
+            hitbox.x + hitbox.width > box.x &&
+            hitbox.y < box.y + box.height &&
+            hitbox.y + hitbox.height > box.y
         ) {
-            gameOver();
+            gameOver("โดนกล่อง!");
             return;
+        }
+    }
+    for (let pit of pits) {
+        // ชนหลุม ถ้าด้านล่างไดโนอยู่ต่ำกว่าขอบ pit
+        if (
+            hitbox.x + hitbox.width > pit.x &&
+            hitbox.x < pit.x + pit.width &&
+            hitbox.y + hitbox.height > pit.y
+        ) {
+            // ถ้าไดโนอยู่ต่ำกว่าหลุม (ตกหลุม)
+            if (dino.y + dino.height >= pit.y) {
+                gameOver("ตกหลุม!");
+                return;
+            }
+        }
+    }
+    for (let i = coins.length - 1; i >= 0; i--) {
+        let coin = coins[i];
+        if (
+            hitbox.x < coin.x + coin.width &&
+            hitbox.x + hitbox.width > coin.x &&
+            hitbox.y < coin.y + coin.height &&
+            hitbox.y + hitbox.height > coin.y
+        ) {
+            // เก็บเหรียญ!
+            showAchievement("💰 เก็บเหรียญได้ +10 คะแนน!");
+            score += 10;
+            coins.splice(i, 1);
         }
     }
 }
 
-function gameOver() {
+function gameOver(reason = "") {
     gameRunning = false;
     document.getElementById('startBtn').textContent = 'Start Game';
-
     if (Math.floor(score) > highScore) {
         highScore = Math.floor(score);
         localStorage.setItem('dinoHighScore', highScore.toString());
         document.getElementById('highScore').textContent = highScore;
         showAchievement('🏆 New High Score: ' + highScore + '!');
     }
-
     document.getElementById('finalScore').textContent = Math.floor(score);
     document.getElementById('gameOver').classList.add('show');
     createExplosionParticles();
+
+    // โผล่ meme ปลอบใจ
+    let memeMsg = reason ? reason + " " : "";
+    memeMsg += memePool[Math.floor(Math.random() * memePool.length)];
+    showMeme(memeMsg);
 }
 
 function restartGame() {
     gameRunning = false;
     gameStarted = false;
     document.getElementById('gameOver').classList.remove('show');
+    document.getElementById('memeMsg').classList.remove('show');
     drawGame();
     startGame();
 }
@@ -329,7 +402,9 @@ function drawGame() {
     drawGround();
     drawDino();
     drawObstacles();
-    drawBirds();
+    drawBoxes();
+    drawCoins();
+    drawPits();
     drawParticles();
     if (gameRunning) {
         drawRunningEffects();
@@ -380,10 +455,26 @@ function drawObstacles() {
     }
 }
 
-function drawBirds() {
-    for (let bird of birds) {
+function drawBoxes() {
+    for (let box of boxes) {
         ctx.save();
-        ctx.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height);
+        ctx.drawImage(boxImg, box.x, box.y, box.width, box.height);
+        ctx.restore();
+    }
+}
+
+function drawCoins() {
+    for (let coin of coins) {
+        ctx.save();
+        ctx.drawImage(coinImg, coin.x, coin.y, coin.width, coin.height);
+        ctx.restore();
+    }
+}
+
+function drawPits() {
+    for (let pit of pits) {
+        ctx.save();
+        ctx.drawImage(pitImg, pit.x, pit.y, pit.width, pit.height);
         ctx.restore();
     }
 }
