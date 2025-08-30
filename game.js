@@ -27,12 +27,14 @@ let gameRunning = false;
 let gameStarted = false;
 let score = 0;
 let highScore = Number(localStorage.getItem('dinoHighScore') || '0');
-let gameSpeed = 3;
+
+// ปรับความเร็วเริ่มต้นให้ช้าลง (เดิม 3)
+let gameSpeed = 1.5; // <<< ช้าลง
 let gravity = 0.5;
 let jumpPower = 12;
 
 let dino = {
-    x: 50,
+    x: 70, // ขยับออกจากขอบซ้าย
     y: 0,
     width: 60,
     height: 60,
@@ -63,9 +65,9 @@ function resizeCanvas() {
     const container = canvas.parentElement;
     const maxWidth = Math.min(600, container.offsetWidth - 40);
     canvas.width = maxWidth;
-    canvas.height = Math.max(250, maxWidth * 0.5);
-    dino.y = canvas.height - dino.height - 40;
-    dino.x = Math.min(50, canvas.width * 0.1);
+    canvas.height = Math.max(280, maxWidth * 0.55); // สูงขึ้นเล็กน้อย
+    dino.y = canvas.height - dino.height - 50; // ขยับลงต่ำกว่าเดิม
+    dino.x = Math.max(70, canvas.width * 0.12); // ขยับออกจากขอบ
 }
 
 setTimeout(() => {
@@ -124,7 +126,7 @@ window.startGame = function() {
     gameRunning = true;
     gameStarted = true;
     score = 0;
-    gameSpeed = 3;
+    gameSpeed = 1.5; // <<< ให้ช้าทุกครั้งที่เริ่มเกม
     obstacles = [];
     boxes = [];
     coins = [];
@@ -132,7 +134,7 @@ window.startGame = function() {
     particles = [];
     comboJump = 0;
 
-    dino.y = canvas.height - dino.height - 40;
+    dino.y = canvas.height - dino.height - 50;
     dino.velocityY = 0;
     dino.jumping = false;
 
@@ -158,7 +160,8 @@ function update() {
     if (!gameRunning) return;
     score += 0.1;
     document.getElementById('score').textContent = Math.floor(score);
-    gameSpeed = 3 + (score * 0.003);
+    // ปรับให้เร็วขึ้นทีละน้อยกว่าเดิม
+    gameSpeed = 1.5 + (score * 0.003); // เดิม 3 + (score * 0.003)
     updateDino();
     updateObstacles();
     updateBoxes();
@@ -172,8 +175,8 @@ function updateDino() {
     if (dino.jumping) {
         dino.velocityY += gravity;
         dino.y += dino.velocityY;
-        if (dino.y >= canvas.height - dino.height - 40) {
-            dino.y = canvas.height - dino.height - 40;
+        if (dino.y >= canvas.height - dino.height - 50) {
+            dino.y = canvas.height - dino.height - 50;
             dino.jumping = false;
             dino.velocityY = 0;
         }
@@ -224,20 +227,20 @@ function updatePits() {
     }
 }
 
-// กระบองเพชรเล็ก ระยะห่างเยอะ เล่นง่าย
+// กระบองเพชรปรับขนาดใหญ่ขึ้น และเว้นระยะห่างมากขึ้น
 function spawnObstacles() {
     if (!gameRunning) return;
     const obstacle = {
-        x: canvas.width,
-        y: canvas.height - 40 - 30,
-        width: 26,
-        height: 30,
+        x: canvas.width + 30, // ขยับให้ spawn ไกลกว่าเดิม
+        y: canvas.height - 50 - 45, // ขยับลง
+        width: 38, // <<< ใหญ่ขึ้น (เดิม 26)
+        height: 45, // <<< ใหญ่ขึ้น (เดิม 30)
         color: '#ff006e'
     };
     obstacles.push(obstacle);
 
-    // Schedule next obstacle (ระยะห่างเยอะขึ้น)
-    const delay = Math.random() * 1500 + 1100;
+    // Schedule next obstacle เว้นระยะมากขึ้น
+    const delay = Math.random() * 1800 + 1300;
     setTimeout(spawnObstacles, delay);
 
     // Combo Jump
@@ -251,36 +254,36 @@ function spawnObstacles() {
     }
 }
 
-// กล่อง: ต้องกระโดดข้ามหรือเลี่ยง
+// กล่อง: spawn ไกลกว่าเดิม
 function spawnBox() {
     if (!gameRunning) return;
     const box = {
-        x: canvas.width + 80,
-        y: canvas.height - 40 - 32,
+        x: canvas.width + 100,
+        y: canvas.height - 50 - 38,
         width: 32,
         height: 32
     };
     boxes.push(box);
 }
 
-// เหรียญ: กระโดดเก็บได้ (วางสูงขึ้น)
+// เหรียญ: spawn ไกลและสูงกว่าเดิม
 function spawnCoin() {
     if (!gameRunning) return;
     const coin = {
-        x: canvas.width + 150,
-        y: canvas.height - 40 - dino.height - 20,
+        x: canvas.width + 180,
+        y: canvas.height - 50 - dino.height - 24,
         width: 24,
         height: 24
     };
     coins.push(coin);
 }
 
-// หลุม: ต้องกระโดดข้าม (วางติดพื้น)
+// หลุม: spawn ไกลกว่าเดิม
 function spawnPit() {
     if (!gameRunning) return;
     const pit = {
-        x: canvas.width + 220,
-        y: canvas.height - 40,
+        x: canvas.width + 250,
+        y: canvas.height - 50,
         width: 36,
         height: 12
     };
@@ -318,13 +321,11 @@ function checkCollisions() {
         }
     }
     for (let pit of pits) {
-        // ชนหลุม ถ้าด้านล่างไดโนอยู่ต่ำกว่าขอบ pit
         if (
             hitbox.x + hitbox.width > pit.x &&
             hitbox.x < pit.x + pit.width &&
             hitbox.y + hitbox.height > pit.y
         ) {
-            // ถ้าไดโนอยู่ต่ำกว่าหลุม (ตกหลุม)
             if (dino.y + dino.height >= pit.y) {
                 gameOver("ตกหลุม!");
                 return;
@@ -339,7 +340,6 @@ function checkCollisions() {
             hitbox.y < coin.y + coin.height &&
             hitbox.y + hitbox.height > coin.y
         ) {
-            // เก็บเหรียญ!
             showAchievement("💰 เก็บเหรียญได้ +10 คะแนน!");
             score += 10;
             coins.splice(i, 1);
@@ -360,7 +360,6 @@ function gameOver(reason = "") {
     document.getElementById('gameOver').classList.add('show');
     createExplosionParticles();
 
-    // โผล่ meme ปลอบใจ
     let memeMsg = reason ? reason + " " : "";
     memeMsg += memePool[Math.floor(Math.random() * memePool.length)];
     showMeme(memeMsg);
@@ -450,7 +449,7 @@ function drawGrid() {
 }
 
 function drawGround() {
-    const groundY = canvas.height - 40;
+    const groundY = canvas.height - 50;
     ctx.strokeStyle = '#00ff41';
     ctx.lineWidth = 3;
     ctx.shadowColor = '#00ff41';
@@ -463,11 +462,9 @@ function drawGround() {
 }
 
 function safeDrawImage(img, x, y, w, h, fallbackColor = '#333') {
-    // เช็คสถานะรูปว่าพร้อมวาด
     if (img && img.complete && img.naturalWidth !== 0 && !img.broken) {
         ctx.drawImage(img, x, y, w, h);
     } else {
-        // รูปเสีย/โหลดไม่สำเร็จ ใช้ fallback เป็นกล่องสี
         ctx.save();
         ctx.fillStyle = fallbackColor;
         ctx.fillRect(x, y, w, h);
