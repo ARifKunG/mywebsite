@@ -5,22 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🎮 ARifKunG Hub 🎮</title>
     <link rel="stylesheet" href="style.css">
-    <!-- ถ้าใช้ไฟล์ style.css อยู่แล้ว ไม่ต้องเพิ่ม <style> -->
 </head>
 <body>
     <!-- Loading Screen -->
     <div class="loading-screen" id="loadingScreen">
         <div class="loading-text">🎮 LOADING ARIFKUNG HUB... 🎮</div>
     </div>
-
-    <!-- พื้นหลัง Matrix และ Particles -->
     <div class="matrix-bg"></div>
     <div class="particles" id="particles"></div>
-
-    <!-- หน้าต่าง Achievement แจ้งเตือน -->
     <div class="achievement" id="achievement"> ฮั่นแน่มาส่องเว็บจะโดเนทใช่มั้ยล่าาาา </div>
-
-    <!-- ส่วน Header (โปรไฟล์, avatar, ชื่อ ฯลฯ) -->
     <header>
         <div class="gamer-profile">
             <div class="avatar-container">
@@ -32,58 +25,40 @@
             <div class="typing-text">ฮั่นแน่ มาหาเซิฟ VIP ฟรีอะดิ่ !</div>
         </div>
     </header>
-
-    <!-- ปุ่มเปิด/ปิดเกม -->
     <div class="center-btn">
         <button id="toggleGameBtn" class="main-toggle-btn" onclick="toggleDinoGame()"> เปิด/ปิด เกมไม่หลบเป็นเกย์ </button>
     </div>
-
-    <!-- ส่วนเกม (ซ่อน/แสดงได้) -->
     <div class="mini-games" id="gameContainer" style="display:none;">
         <div class="mini-game">
             <div class="game-container">
-                <!-- ชื่อเกม -->
-                <h3 class="game-title"> Gay Runner </h3>
-
-                <!-- คะแนนในเกม -->
+                <h3 class="game-title">Gay Runner</h3>
                 <div class="game-info">
                     <div class="score">Score: <span id="score">0</span></div>
                     <div class="high-score">High: <span id="highScore">0</span></div>
                 </div>
-
-                <!-- ตัว canvas สำหรับวาดเกม -->
                 <canvas id="gameCanvas" class="game-canvas" width="600" height="300"></canvas>
-
-                <!-- กล่อง Game Over -->
                 <div class="game-over" id="gameOver">
                     <h2> คุณเป็นเกย์แล้ว! </h2>
                     <p>Your Score: <span id="finalScore">0</span></p>
                     <button class="control-btn" onclick="restartGame()">Play Again</button>
                 </div>
-
-                <!-- ปุ่มควบคุมเกม -->
                 <div class="game-controls">
                     <button class="control-btn" id="startBtn" onclick="startGame()">Start Game</button>
                     <button class="control-btn" onclick="jumpDino()">Jump (Space)</button>
                     <button class="control-btn" onclick="restartGame()">Restart</button>
                 </div>
-
-                <!-- คำอธิบายวิธีเล่น -->
                 <div class="game-instructions">
                     <strong>🎮 How to Play:</strong><br>
                     • กด <strong>Space</strong> หรือปุ่ม Jump เพื่อกระโดด<br>
-                    • หลีกเลี่ยงพี่โต! <br>
+                    • หลีกเลี่ยงกระบองเพชร, กล่อง, หลุม <br>
                     • คะแนนจะเพิ่มขึ้นเรื่อยๆ ยิ่งอยู่รอดได้นานยิ่งดี!<br>
+                    • เก็บเหรียญเพื่อคะแนนพิเศษ<br>
                     • เกมจะเร็วขึ้นเรื่อยๆ - ถ้าช้าก็555555! 🔥
                 </div>
-
-                <!-- กล่อง meme/text ปลอบใจ โผล่เมื่อแพ้หรือ combo -->
                 <div id="memeMsg"></div>
             </div>
         </div>
     </div>
-
-    <!-- Social Grid (ลิงก์ Discord/Instagram/Roblox/Donate) -->
     <main class="social-grid">
         <a href="https://discord.gg/gDNxGqr2EC" target="_blank" class="social-card">
             <div class="card-header">
@@ -134,13 +109,6 @@
             </div>
         </a>
     </main>
-
-    <!-- สกรีนโหลด -->
-    <div class="loading-screen" id="loadingScreen">
-        <span class="loading-text">กำลังโหลดเกม...</span>
-    </div>
-
-    <!-- เชื่อม JS เกม -->
     <script src="game.js"></script>
 </body>
 </html>
