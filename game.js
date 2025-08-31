@@ -80,7 +80,7 @@ window.addEventListener('resize', resizeCanvas);
 document.getElementById('highScore').textContent = highScore;
 drawGame();
 
-function showAchievement(text = '🏆 Achievement Unlocked: Welcome Gamer!') {
+function showAchievement(text = '🏆 ยินดีต้อนรับ!!!') {
     const ach = document.getElementById('achievement');
     ach.textContent = text;
     ach.classList.add('show');
